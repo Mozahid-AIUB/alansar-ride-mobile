@@ -1,0 +1,8 @@
+{
+  "name": "@alansar/utils",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Formatters (money, date, distance), phone/email validation, constants.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

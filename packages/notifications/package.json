@@ -1,0 +1,8 @@
+{
+  "name": "@alansar/notifications",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Push setup, Android channels (ride_offers, customer_alerts), alert sounds.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

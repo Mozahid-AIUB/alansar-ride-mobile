@@ -1,0 +1,8 @@
+{
+  "name": "@alansar/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "HTTP client for the Express API, endpoint functions, response types and TanStack Query hooks.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

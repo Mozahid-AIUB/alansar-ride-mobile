@@ -1,0 +1,8 @@
+{
+  "name": "@alansar/maps",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Map view, pickup/dropoff markers, route polyline with traffic colours.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

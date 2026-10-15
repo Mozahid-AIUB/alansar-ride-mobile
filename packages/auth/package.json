@@ -1,0 +1,8 @@
+{
+  "name": "@alansar/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Session and token storage, login, OTP sign-up and forgot-password flows.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}
