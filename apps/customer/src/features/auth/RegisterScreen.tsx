@@ -5,44 +5,52 @@ import { EnvelopeSimple, User } from 'phosphor-react-native';
 
 import { authReady } from '@alansar/auth';
 import { lightTheme } from '@alansar/theme';
-import { isValidBdMobile, isValidEmail, toE164Bd } from '@alansar/utils';
+import { isValidBdMobile, isValidEmail, PASSWORD_MIN, toE164Bd } from '@alansar/utils';
 
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { PasswordField } from '@/components/PasswordField';
 import { TextField } from '@/components/TextField';
 
 import { AuthLayout } from './AuthLayout';
-import { GoogleButton, INVALID_PHONE, LegalLinks, OrDivider, SwitchPrompt } from './AuthParts';
+import {
+  GoogleButton,
+  INVALID_EMAIL,
+  INVALID_PHONE,
+  LegalLinks,
+  OrDivider,
+  SwitchPrompt,
+} from './AuthParts';
 import { PhoneField } from './PhoneField';
 import { PreviewNotice } from './PreviewNotice';
 
 const { spacing } = lightTheme;
 
 /**
- * Nothing is sent to the API here. The details travel to the code screen, and
- * the account is only created once the SMS code is verified.
+ * Nothing is sent to the API from here in a way that creates an account: the
+ * API holds the details and emails a code, and the account only exists once
+ * that code is verified on the next screen.
  */
 export function RegisterScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [googleTapped, setGoogleTapped] = useState(false);
 
   const phoneValid = isValidBdMobile(phone);
-  const emailValid = email.trim() === '' || isValidEmail(email);
-  const canSubmit = name.trim().length >= 2 && phoneValid && emailValid && agreed;
+  const emailValid = isValidEmail(email);
+  const canSubmit =
+    name.trim().length >= 2 && phoneValid && emailValid && password.length >= PASSWORD_MIN && agreed;
 
   const onSubmit = () => {
     if (!canSubmit) return;
-    router.push({
-      pathname: '/verify',
-      params: { mode: 'register', phone: toE164Bd(phone), name: name.trim(), email: email.trim() },
-    });
+    router.push({ pathname: '/verify', params: { email: email.trim(), phone: toE164Bd(phone) } });
   };
 
   return (
-    <AuthLayout title="Create your account" subtitle="Sign up in a minute. No password needed.">
+    <AuthLayout title="Create your account" subtitle="Join Al Ansar Ride in under a minute.">
       <View style={styles.form}>
         <View style={styles.fields}>
           <TextField
@@ -72,8 +80,18 @@ export function RegisterScreen() {
             autoComplete="email"
             textContentType="emailAddress"
             autoCapitalize="none"
-            error={emailValid ? undefined : 'Enter a valid email address'}
-            hint="For ride receipts."
+            autoCorrect={false}
+            error={email.trim() !== '' && !emailValid ? INVALID_EMAIL : undefined}
+            hint="We'll send a verification code here."
+          />
+          <PasswordField
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Create a password"
+            autoComplete="new-password"
+            textContentType="newPassword"
+            hint={`At least ${PASSWORD_MIN} characters.`}
           />
         </View>
 
@@ -85,9 +103,8 @@ export function RegisterScreen() {
 
         <OrDivider label="or sign up with" />
         <GoogleButton label="Sign up with Google" onPress={() => setGoogleTapped(true)} />
-
         {googleTapped && !authReady ? (
-          <PreviewNotice message="Preview: Google sign-up will work once Firebase is connected." />
+          <PreviewNotice message="Preview: Google sign-up needs Firebase, which isn't set up yet." />
         ) : null}
 
         <SwitchPrompt

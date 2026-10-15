@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react';
+import { useState, type ComponentType, type ReactNode } from 'react';
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import type { IconProps } from 'phosphor-react-native';
 
@@ -16,14 +16,16 @@ export function FieldMessage({ error, hint }: { error?: string; hint?: string })
   return null;
 }
 
-type Props = Omit<TextInputProps, 'style' | 'onFocus' | 'onBlur'> & {
+export type TextFieldProps = Omit<TextInputProps, 'style' | 'onFocus' | 'onBlur'> & {
   label: string;
   icon?: ComponentType<IconProps>;
+  /** Rendered inside the field after the input, e.g. a show-password toggle. */
+  trailing?: ReactNode;
   error?: string;
   hint?: string;
 };
 
-export function TextField({ label, icon: Icon, error, hint, ...input }: Props) {
+export function TextField({ label, icon: Icon, trailing, error, hint, ...input }: TextFieldProps) {
   const [focused, setFocused] = useState(false);
 
   return (
@@ -45,6 +47,7 @@ export function TextField({ label, icon: Icon, error, hint, ...input }: Props) {
           accessibilityLabel={label}
           style={styles.input}
         />
+        {trailing}
       </View>
       <FieldMessage error={error} hint={hint} />
     </View>

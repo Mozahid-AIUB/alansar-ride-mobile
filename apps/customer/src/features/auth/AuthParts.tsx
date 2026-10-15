@@ -1,6 +1,8 @@
+import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 
-import { lightTheme } from '@alansar/theme';
+import { lightTheme, onHero } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
 import { GoogleLogo } from '@/components/GoogleLogo';
@@ -8,6 +10,10 @@ import { GoogleLogo } from '@/components/GoogleLogo';
 const { colors, spacing, typography } = lightTheme;
 
 export const INVALID_PHONE = 'Enter a valid Bangladeshi mobile number';
+export const INVALID_EMAIL = 'Enter a valid email address';
+
+/** Back to Log in without stacking a second copy of it. */
+export const backToLogin = () => (router.canGoBack() ? router.back() : router.replace('/login'));
 
 export function OrDivider({ label }: { label: string }) {
   return (
@@ -38,10 +44,16 @@ export function SwitchPrompt({
   return (
     <View style={styles.switchRow}>
       <Text style={styles.switchText}>{question}</Text>
-      <Pressable accessibilityRole="button" hitSlop={8} onPress={onPress}>
-        <Text style={styles.link}>{action}</Text>
-      </Pressable>
+      <TextLink label={action} onPress={onPress} />
     </View>
+  );
+}
+
+export function TextLink({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" hitSlop={8} onPress={onPress}>
+      <Text style={styles.link}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -51,6 +63,35 @@ export function LegalLinks() {
       <Text style={styles.inlineLink}>Terms of Service</Text> and{' '}
       <Text style={styles.inlineLink}>Privacy Policy</Text>
     </>
+  );
+}
+
+/** Emphasis inside a header subtitle, e.g. the address a code was sent to. */
+export function HeroStrong({ children }: { children: ReactNode }) {
+  return <Text style={styles.heroStrong}>{children}</Text>;
+}
+
+/** "Resend code in 0:27", then a Resend link once the cooldown ends. */
+export function ResendCode({ seconds = 30, onResend }: { seconds?: number; onResend?: () => void }) {
+  const [left, setLeft] = useState(seconds);
+
+  useEffect(() => {
+    if (left === 0) return;
+    const timer = setTimeout(() => setLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [left]);
+
+  if (left > 0) {
+    return <Text style={styles.muted}>Resend code in 0:{String(left).padStart(2, '0')}</Text>;
+  }
+  return (
+    <TextLink
+      label="Resend code"
+      onPress={() => {
+        setLeft(seconds);
+        onResend?.();
+      }}
+    />
   );
 }
 
@@ -86,5 +127,13 @@ const styles = StyleSheet.create({
   inlineLink: {
     color: colors.primary,
     fontWeight: '600',
+  },
+  heroStrong: {
+    color: onHero.text,
+    fontWeight: '700',
+  },
+  muted: {
+    ...typography.bodySmall,
+    color: colors.textSubtle,
   },
 });

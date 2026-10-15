@@ -6,11 +6,12 @@ Source: `Apps/AlAnsarRideProjectMobileapps/app/lib`. `C` = customer app, `D` = d
 
 | Flutter | New route | App |
 |---|---|---|
-| auth/login_screen | `src/app/(auth)/login.tsx` (phone number or Google, "Sign up" link below) | C, D |
-| auth/register_screen | `src/app/(auth)/register.tsx` (name, phone, email, terms) | C, D |
-| auth/register_otp_screen | `src/app/(auth)/verify.tsx` (SMS code; the account is created only after it) | C, D |
-| auth/verify_email_screen | Not needed: the SMS code verifies the account | C, D |
-| auth/forgot_password_screen, reset_password_screen | Not needed: sign-in has no password | C, D |
+| auth/login_screen | `src/app/(auth)/login.tsx` (phone or email + password, Forgot password, Google, Sign up link) | C, D |
+| auth/register_screen | `src/app/(auth)/register.tsx` (name, phone, email, password, terms) | C, D |
+| auth/register_otp_screen | `src/app/(auth)/verify.tsx` (emailed code; the account is created only after it) | C, D |
+| auth/verify_email_screen | Covered by `verify.tsx`: sign-up already verifies the email | C, D |
+| auth/forgot_password_screen | `src/app/(auth)/forgot-password.tsx` | C, D |
+| auth/reset_password_screen | `src/app/(auth)/reset-password.tsx` (code + new password) | C, D |
 | auth/auth_gate | `src/app/_layout.tsx` (redirect by session) | C, D |
 | onboarding/onboarding_screen | `src/app/onboarding.tsx` | C |
 | customer/customer_shell | `src/app/(tabs)/_layout.tsx` | C |

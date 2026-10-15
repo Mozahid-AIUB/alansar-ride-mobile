@@ -1,13 +1,13 @@
 /**
- * Sign-in for both apps: phone number + SMS code, or Google. Both go through
- * Firebase Authentication, and the Firebase ID token is then exchanged at
- * `POST /api/auth/verify-firebase-token` for the API's own session.
+ * Sign-in for both apps, against the existing API:
  *
- * Not connected yet. It needs:
- *   1. Phone and Google sign-in enabled in the `alansar-ride-project` Firebase console
- *   2. FIREBASE_ENABLED=true and the service account on the API (Coolify env)
- *   3. A development build of the app (Firebase is native, so not Expo Go)
+ *   Log in            phone or email + password     POST /api/auth/login
+ *   Sign up           details, then emailed code    POST /api/auth/register, /register/verify
+ *   Forgot password   emailed code + new password   POST /api/auth/password/forgot, /password/reset
+ *   Google            Firebase ID token             POST /api/auth/verify-firebase-token
  *
- * Until then `authReady` is false and the sign-in screens run in preview mode.
+ * The screens are built but not wired to the API yet, so `authReady` is false
+ * and they run in preview mode. Google also needs Firebase enabled on the API
+ * (FIREBASE_ENABLED=true) and a development build of the app.
  */
 export const authReady = false;

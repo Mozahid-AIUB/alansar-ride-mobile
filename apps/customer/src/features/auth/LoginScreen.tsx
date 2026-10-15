@@ -1,56 +1,80 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { ArrowRight } from 'phosphor-react-native';
+import { ArrowRight, User } from 'phosphor-react-native';
 
 import { authReady } from '@alansar/auth';
 import { lightTheme } from '@alansar/theme';
-import { isValidBdMobile, toE164Bd } from '@alansar/utils';
+import { isValidLoginId } from '@alansar/utils';
 
 import { Button } from '@/components/Button';
+import { PasswordField } from '@/components/PasswordField';
+import { TextField } from '@/components/TextField';
 
 import { AuthLayout } from './AuthLayout';
-import { GoogleButton, INVALID_PHONE, LegalLinks, OrDivider, SwitchPrompt } from './AuthParts';
-import { PhoneField } from './PhoneField';
+import { GoogleButton, LegalLinks, OrDivider, SwitchPrompt, TextLink } from './AuthParts';
 import { PreviewNotice } from './PreviewNotice';
 
 const { colors, spacing, typography } = lightTheme;
 
 export function LoginScreen() {
-  const [phone, setPhone] = useState('');
-  const [googleTapped, setGoogleTapped] = useState(false);
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+  const [tapped, setTapped] = useState<'login' | 'google' | null>(null);
 
-  const valid = isValidBdMobile(phone);
-  const error = phone.length === 10 && !valid ? INVALID_PHONE : undefined;
-
-  const onContinue = () => {
-    if (!valid) return;
-    router.push({ pathname: '/verify', params: { mode: 'login', phone: toE164Bd(phone) } });
+  const canSubmit = isValidLoginId(loginId.trim()) && password.length > 0;
+  const onSubmit = () => {
+    if (canSubmit) setTapped('login');
   };
 
   return (
     <AuthLayout title="Welcome back" subtitle="Log in to book your next ride.">
       <View style={styles.form}>
-        <PhoneField
-          label="Mobile number"
-          value={phone}
-          onChange={setPhone}
-          error={error}
-          onSubmit={onContinue}
-        />
+        <View style={styles.fields}>
+          <TextField
+            label="Phone or email"
+            icon={User}
+            value={loginId}
+            onChangeText={setLoginId}
+            placeholder="01712-345678 or you@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username"
+            textContentType="username"
+            returnKeyType="next"
+          />
+          <View>
+            <PasswordField
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Your password"
+              autoComplete="current-password"
+              textContentType="password"
+              returnKeyType="done"
+              onSubmitEditing={onSubmit}
+            />
+            <View style={styles.forgot}>
+              <TextLink label="Forgot password?" onPress={() => router.push('/forgot-password')} />
+            </View>
+          </View>
+        </View>
 
         <Button
           label="Log in"
-          disabled={!valid}
-          onPress={onContinue}
+          disabled={!canSubmit}
+          onPress={onSubmit}
           trailing={<ArrowRight size={20} color={colors.onPrimary} weight="bold" />}
         />
+        {tapped === 'login' && !authReady ? (
+          <PreviewNotice message="Preview: the app isn't connected to the server yet, so nothing was checked." />
+        ) : null}
 
         <OrDivider label="or continue with" />
-        <GoogleButton label="Continue with Google" onPress={() => setGoogleTapped(true)} />
-
-        {googleTapped && !authReady ? (
-          <PreviewNotice message="Preview: Google sign-in will work once Firebase is connected." />
+        <GoogleButton label="Continue with Google" onPress={() => setTapped('google')} />
+        {tapped === 'google' && !authReady ? (
+          <PreviewNotice message="Preview: Google sign-in needs Firebase, which isn't set up yet." />
         ) : null}
 
         <SwitchPrompt
@@ -72,6 +96,13 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
   form: {
     gap: spacing.lg,
+  },
+  fields: {
+    gap: spacing.md + 4,
+  },
+  forgot: {
+    alignItems: 'flex-end',
+    marginTop: spacing.sm + 4,
   },
   spacer: {
     flex: 1,
