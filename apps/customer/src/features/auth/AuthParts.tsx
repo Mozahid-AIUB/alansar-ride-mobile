@@ -57,10 +57,11 @@ export function TextLink({ label, onPress }: { label: string; onPress: () => voi
   );
 }
 
-export function LegalLinks() {
+/** `short` says "Terms" instead of "Terms of Service", to keep a checkbox label on one line. */
+export function LegalLinks({ short = false }: { short?: boolean }) {
   return (
     <>
-      <Text style={styles.inlineLink}>Terms of Service</Text> and{' '}
+      <Text style={styles.inlineLink}>{short ? 'Terms' : 'Terms of Service'}</Text> and{' '}
       <Text style={styles.inlineLink}>Privacy Policy</Text>
     </>
   );

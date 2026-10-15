@@ -52,7 +52,7 @@ export function TextField({ label, icon: Icon, trailing, error, ...input }: Text
 /** Shared by TextField and PhoneField so every input reads the same. */
 export const fieldStyles = StyleSheet.create({
   field: {
-    height: controls.buttonHeight,
+    height: controls.inputHeight,
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: radius.md,

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: radius.xl + spacing.md,
+    paddingBottom: radius.xl + spacing.sm + 4,
     overflow: 'hidden',
   },
   orb: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     ...typography.headlineLarge,
     color: onHero.text,
     textAlign: 'center',
-    marginTop: spacing.md,
+    marginTop: spacing.sm + 4,
   },
   subtitle: {
     ...typography.bodySmall,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   sheet: {
     flex: 1,
     marginTop: -radius.xl,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.md + 4,
     paddingHorizontal: spacing.lg,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,

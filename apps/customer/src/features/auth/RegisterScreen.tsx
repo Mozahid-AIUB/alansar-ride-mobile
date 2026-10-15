@@ -35,13 +35,20 @@ export function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [googleTapped, setGoogleTapped] = useState(false);
 
   const phoneValid = isValidBdMobile(phone);
   const emailValid = isValidEmail(email);
+  const mismatch = confirm !== '' && confirm !== password;
   const canSubmit =
-    name.trim().length >= 2 && phoneValid && emailValid && password.length >= PASSWORD_MIN && agreed;
+    name.trim().length >= 2 &&
+    phoneValid &&
+    emailValid &&
+    password.length >= PASSWORD_MIN &&
+    confirm === password &&
+    agreed;
 
   const onSubmit = () => {
     if (!canSubmit) return;
@@ -87,10 +94,18 @@ export function RegisterScreen() {
             autoComplete="new-password"
             textContentType="newPassword"
           />
+          <PasswordField
+            label="Confirm password"
+            value={confirm}
+            onChangeText={setConfirm}
+            autoComplete="new-password"
+            textContentType="newPassword"
+            error={mismatch ? "Passwords don't match" : undefined}
+          />
         </View>
 
         <Checkbox checked={agreed} onChange={setAgreed}>
-          I agree to the <LegalLinks />
+          I agree to the <LegalLinks short />
         </Checkbox>
 
         <Button label="Create account" disabled={!canSubmit} onPress={onSubmit} />
@@ -113,9 +128,9 @@ export function RegisterScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    gap: spacing.md,
+    gap: spacing.sm + 6,
   },
   fields: {
-    gap: spacing.sm + 4,
+    gap: spacing.sm + 2,
   },
 });

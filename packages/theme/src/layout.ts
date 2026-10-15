@@ -28,6 +28,8 @@ export const shadows = {
 export const controls = {
   /** Primary and outlined buttons are full-width pills of this height. */
   buttonHeight: 56,
+  /** Text fields sit a little lower than buttons so long forms fit one screen. */
+  inputHeight: 52,
   inputPaddingX: spacing.md,
   inputPaddingY: 18,
   borderWidth: 1,
