@@ -6,9 +6,9 @@ Source: `Apps/AlAnsarRideProjectMobileapps/app/lib`. `C` = customer app, `D` = d
 
 | Flutter | New route | App |
 |---|---|---|
-| auth/login_screen | `src/app/(auth)/login.tsx` (phone number or Google) | C, D |
-| auth/register_otp_screen | `src/app/(auth)/verify.tsx` (SMS code) | C, D |
-| auth/register_screen | Merged into login: a new number signs up after the code, then `src/app/(auth)/profile.tsx` asks for name and email | C, D |
+| auth/login_screen | `src/app/(auth)/login.tsx` (phone number or Google, "Sign up" link below) | C, D |
+| auth/register_screen | `src/app/(auth)/register.tsx` (name, phone, email, terms) | C, D |
+| auth/register_otp_screen | `src/app/(auth)/verify.tsx` (SMS code; the account is created only after it) | C, D |
 | auth/verify_email_screen | Not needed: the SMS code verifies the account | C, D |
 | auth/forgot_password_screen, reset_password_screen | Not needed: sign-in has no password | C, D |
 | auth/auth_gate | `src/app/_layout.tsx` (redirect by session) | C, D |

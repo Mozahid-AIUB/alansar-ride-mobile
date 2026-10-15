@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -78,11 +78,17 @@ export function WelcomeScreen() {
           <PressableScale
             accessibilityRole="button"
             style={styles.primaryButton}
-            onPress={() => router.push('/login')}
+            onPress={() => router.push('/register')}
           >
             <Text style={styles.primaryLabel}>Get started</Text>
             <ArrowRight size={20} color={colors.onPrimary} weight="bold" />
           </PressableScale>
+          <View style={styles.loginRow}>
+            <Text style={styles.loginText}>Already have an account?</Text>
+            <Pressable accessibilityRole="button" hitSlop={8} onPress={() => router.push('/login')}>
+              <Text style={styles.loginLink}>Log in</Text>
+            </Pressable>
+          </View>
         </Animated.View>
       </View>
     </View>
@@ -203,5 +209,20 @@ const styles = StyleSheet.create({
   primaryLabel: {
     ...typography.button,
     color: colors.onPrimary,
+  },
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+    marginTop: spacing.md,
+  },
+  loginText: {
+    ...typography.body,
+    color: colors.textMuted,
+  },
+  loginLink: {
+    ...typography.titleSmall,
+    color: colors.primary,
   },
 });

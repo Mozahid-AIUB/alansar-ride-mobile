@@ -4,22 +4,27 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { lightTheme } from '@alansar/theme';
 import { bdSignificantDigits, formatBdSignificant } from '@alansar/utils';
 
-const { colors, radius, spacing, typography, controls } = lightTheme;
+import { FieldLabel, FieldMessage, fieldStyles } from '@/components/TextField';
+
+const { colors, spacing, typography } = lightTheme;
 
 type Props = {
+  label: string;
   /** Significant digits only, e.g. `1712345678`. */
   value: string;
   onChange: (digits: string) => void;
   error?: string;
   onSubmit?: () => void;
+  autoFocus?: boolean;
 };
 
-export function PhoneField({ value, onChange, error, onSubmit }: Props) {
+export function PhoneField({ label, value, onChange, error, onSubmit, autoFocus = false }: Props) {
   const [focused, setFocused] = useState(false);
 
   return (
     <View>
-      <View style={[styles.field, focused && styles.focused, !!error && styles.invalid]}>
+      <FieldLabel>{label}</FieldLabel>
+      <View style={[fieldStyles.field, focused && fieldStyles.focused, !!error && fieldStyles.invalid]}>
         <View style={styles.country}>
           <Text style={styles.flag}>🇧🇩</Text>
           <Text style={styles.code}>+880</Text>
@@ -33,37 +38,21 @@ export function PhoneField({ value, onChange, error, onSubmit }: Props) {
           keyboardType="phone-pad"
           textContentType="telephoneNumber"
           autoComplete="tel"
-          autoFocus
+          autoFocus={autoFocus}
           returnKeyType="done"
           onSubmitEditing={onSubmit}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          accessibilityLabel="Mobile number"
-          style={styles.input}
+          accessibilityLabel={label}
+          style={[fieldStyles.input, styles.input]}
         />
       </View>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <FieldMessage error={error} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  field: {
-    height: controls.buttonHeight + 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: radius.md,
-    borderWidth: controls.borderWidth,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  focused: {
-    borderColor: colors.primary,
-    borderWidth: controls.focusBorderWidth,
-  },
-  invalid: {
-    borderColor: colors.danger,
-  },
   country: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -71,7 +60,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   flag: {
-    fontSize: 20,
+    fontSize: 18,
   },
   code: {
     ...typography.titleSmall,
@@ -84,21 +73,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
   },
   input: {
-    flex: 1,
-    height: '100%',
     paddingHorizontal: spacing.md,
-    fontSize: 18,
     fontWeight: '600',
-    letterSpacing: 0.5,
-    color: colors.text,
-    // The field's own border shows focus. On web, a zero-width solid outline
-    // replaces the browser's `auto` focus ring, which ignores outline width.
-    outlineStyle: 'solid',
-    outlineWidth: 0,
-  },
-  error: {
-    ...typography.bodySmall,
-    color: colors.danger,
-    marginTop: spacing.sm,
+    letterSpacing: 0.4,
   },
 });

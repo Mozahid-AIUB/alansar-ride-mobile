@@ -156,6 +156,9 @@ export const onHero = {
   text: palette.white,
   textMuted: 'rgba(255, 255, 255, 0.78)',
   orb: 'rgba(255, 255, 255, 0.08)',
+  /** Frosted control surface, e.g. the back button on the header. */
+  glass: 'rgba(255, 255, 255, 0.16)',
+  glassBorder: 'rgba(255, 255, 255, 0.28)',
 } as const;
 
 /** For expo-linear-gradient: `<LinearGradient {...gradients.header} />`. */
