@@ -57,7 +57,7 @@ export function WelcomeScreen() {
           Go anywhere,{'\n'}anytime.
         </Animated.Text>
         <Animated.Text entering={enter(360)} style={styles.subtitle}>
-          Safe, reliable rides across the city, at a fare you agree on.
+          Safe, reliable rides at a fare you agree on.
         </Animated.Text>
 
         <View style={styles.highlights}>
