@@ -20,7 +20,11 @@ type Props = {
   children: ReactNode;
 };
 
-/** Logo and heading on the brand gradient, form on a white sheet: every sign-in screen. */
+/**
+ * Compact brand header over a white sheet: the frame for every sign-in screen.
+ * The header clears the status bar and the sheet clears the home indicator, so
+ * nothing sits under system UI. Content scrolls only if a screen is too short.
+ */
 export function AuthLayout({ title, subtitle, children }: Props) {
   const insets = useSafeAreaInsets();
 
@@ -39,13 +43,19 @@ export function AuthLayout({ title, subtitle, children }: Props) {
         <View style={[styles.orb, styles.orbTop]} />
         <View style={[styles.orb, styles.orbBottom]} />
 
-        <View style={styles.back}>
+        <View style={styles.topRow}>
           <BackButton tone="onHero" />
+          <Animated.View
+            entering={ZoomIn.duration(520).springify()}
+            style={styles.logoTile}
+            pointerEvents="none"
+          >
+            <Image source={logo} style={styles.logo} contentFit="contain" />
+          </Animated.View>
+          {/* Balances the back button so the logo sits dead centre. */}
+          <View style={styles.balance} />
         </View>
 
-        <Animated.View entering={ZoomIn.duration(520).springify()} style={styles.logoTile}>
-          <Image source={logo} style={styles.logo} contentFit="contain" />
-        </Animated.View>
         <Animated.Text entering={FadeInDown.delay(80).duration(460)} style={styles.title}>
           {title}
         </Animated.Text>
@@ -68,9 +78,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   hero: {
-    alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingBottom: radius.xl + spacing.lg,
+    paddingBottom: radius.xl + spacing.md,
     overflow: 'hidden',
   },
   orb: {
@@ -79,34 +88,38 @@ const styles = StyleSheet.create({
     backgroundColor: onHero.orb,
   },
   orbTop: {
-    width: 260,
-    height: 260,
-    top: -110,
+    width: 240,
+    height: 240,
+    top: -120,
     right: -70,
   },
   orbBottom: {
-    width: 160,
-    height: 160,
+    width: 140,
+    height: 140,
     bottom: -60,
     left: -50,
   },
-  back: {
-    alignSelf: 'flex-start',
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  balance: {
+    width: 44,
   },
   logoTile: {
-    width: 88,
-    height: 88,
-    borderRadius: radius.xl - 4,
+    width: 60,
+    height: 60,
+    borderRadius: radius.lg,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: shadows.raised,
-    marginTop: spacing.xs,
   },
   logo: {
-    width: 68,
-    height: 68,
-    borderRadius: radius.md,
+    width: 46,
+    height: 46,
+    borderRadius: radius.sm,
   },
   title: {
     ...typography.headlineLarge,
@@ -115,8 +128,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   subtitle: {
-    ...typography.body,
-    lineHeight: 22,
+    ...typography.bodySmall,
+    lineHeight: 20,
     color: onHero.textMuted,
     textAlign: 'center',
     marginTop: spacing.xs,
@@ -124,7 +137,7 @@ const styles = StyleSheet.create({
   sheet: {
     flex: 1,
     marginTop: -radius.xl,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,

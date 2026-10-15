@@ -48,19 +48,16 @@ export function ResetPasswordScreen() {
 
       <View style={styles.fields}>
         <PasswordField
-          label="New password"
+          label={`New password (min. ${PASSWORD_MIN} characters)`}
           value={password}
           onChangeText={setPassword}
-          placeholder="Create a new password"
           autoComplete="new-password"
           textContentType="newPassword"
-          hint={`At least ${PASSWORD_MIN} characters.`}
         />
         <PasswordField
           label="Confirm new password"
           value={confirm}
           onChangeText={setConfirm}
-          placeholder="Type it again"
           autoComplete="new-password"
           textContentType="newPassword"
           error={mismatch ? "Passwords don't match" : undefined}
@@ -91,13 +88,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing.md,
   },
   fields: {
-    gap: spacing.md + 4,
+    gap: spacing.sm + 4,
   },
   notice: {
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
   },
   spacer: {
     flex: 1,

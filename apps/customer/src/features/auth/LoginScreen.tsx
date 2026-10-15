@@ -36,7 +36,6 @@ export function LoginScreen() {
             icon={User}
             value={loginId}
             onChangeText={setLoginId}
-            placeholder="01712-345678 or you@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
@@ -44,20 +43,17 @@ export function LoginScreen() {
             textContentType="username"
             returnKeyType="next"
           />
-          <View>
-            <PasswordField
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Your password"
-              autoComplete="current-password"
-              textContentType="password"
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
-            />
-            <View style={styles.forgot}>
-              <TextLink label="Forgot password?" onPress={() => router.push('/forgot-password')} />
-            </View>
+          <PasswordField
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            autoComplete="current-password"
+            textContentType="password"
+            returnKeyType="done"
+            onSubmitEditing={onSubmit}
+          />
+          <View style={styles.forgot}>
+            <TextLink label="Forgot password?" onPress={() => router.push('/forgot-password')} />
           </View>
         </View>
 
@@ -71,7 +67,7 @@ export function LoginScreen() {
           <PreviewNotice message="Preview: the app isn't connected to the server yet, so nothing was checked." />
         ) : null}
 
-        <OrDivider label="or continue with" />
+        <OrDivider label="or" />
         <GoogleButton label="Continue with Google" onPress={() => setTapped('google')} />
         {tapped === 'google' && !authReady ? (
           <PreviewNotice message="Preview: Google sign-in needs Firebase, which isn't set up yet." />
@@ -95,18 +91,17 @@ export function LoginScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    gap: spacing.lg,
+    gap: spacing.md,
   },
   fields: {
-    gap: spacing.md + 4,
+    gap: spacing.sm + 4,
   },
   forgot: {
     alignItems: 'flex-end',
-    marginTop: spacing.sm + 4,
   },
   spacer: {
     flex: 1,
-    minHeight: spacing.xl,
+    minHeight: spacing.lg,
   },
   terms: {
     ...typography.caption,

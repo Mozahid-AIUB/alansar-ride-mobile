@@ -27,9 +27,8 @@ import { PreviewNotice } from './PreviewNotice';
 const { spacing } = lightTheme;
 
 /**
- * Nothing is sent to the API from here in a way that creates an account: the
- * API holds the details and emails a code, and the account only exists once
- * that code is verified on the next screen.
+ * Nothing here creates an account: the API holds the details and emails a
+ * code, and the account only exists once that code is verified on the next screen.
  */
 export function RegisterScreen() {
   const [name, setName] = useState('');
@@ -58,7 +57,6 @@ export function RegisterScreen() {
             icon={User}
             value={name}
             onChangeText={setName}
-            placeholder="e.g. Rahim Uddin"
             autoComplete="name"
             textContentType="name"
             autoCapitalize="words"
@@ -71,27 +69,23 @@ export function RegisterScreen() {
             error={phone.length === 10 && !phoneValid ? INVALID_PHONE : undefined}
           />
           <TextField
-            label="Email"
+            label="Email address"
             icon={EnvelopeSimple}
             value={email}
             onChangeText={setEmail}
-            placeholder="you@example.com"
             keyboardType="email-address"
             autoComplete="email"
             textContentType="emailAddress"
             autoCapitalize="none"
             autoCorrect={false}
             error={email.trim() !== '' && !emailValid ? INVALID_EMAIL : undefined}
-            hint="We'll send a verification code here."
           />
           <PasswordField
-            label="Password"
+            label={`Password (min. ${PASSWORD_MIN} characters)`}
             value={password}
             onChangeText={setPassword}
-            placeholder="Create a password"
             autoComplete="new-password"
             textContentType="newPassword"
-            hint={`At least ${PASSWORD_MIN} characters.`}
           />
         </View>
 
@@ -101,7 +95,7 @@ export function RegisterScreen() {
 
         <Button label="Create account" disabled={!canSubmit} onPress={onSubmit} />
 
-        <OrDivider label="or sign up with" />
+        <OrDivider label="or" />
         <GoogleButton label="Sign up with Google" onPress={() => setGoogleTapped(true)} />
         {googleTapped && !authReady ? (
           <PreviewNotice message="Preview: Google sign-up needs Firebase, which isn't set up yet." />
@@ -119,9 +113,9 @@ export function RegisterScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    gap: spacing.lg,
+    gap: spacing.md,
   },
   fields: {
-    gap: spacing.md + 4,
+    gap: spacing.sm + 4,
   },
 });

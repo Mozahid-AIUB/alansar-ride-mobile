@@ -6,32 +6,26 @@ import { lightTheme } from '@alansar/theme';
 
 const { colors, radius, spacing, typography, controls } = lightTheme;
 
-export function FieldLabel({ children }: { children: string }) {
-  return <Text style={styles.label}>{children}</Text>;
+export function FieldError({ error }: { error?: string }) {
+  return error ? <Text style={styles.error}>{error}</Text> : null;
 }
 
-export function FieldMessage({ error, hint }: { error?: string; hint?: string }) {
-  if (error) return <Text style={styles.error}>{error}</Text>;
-  if (hint) return <Text style={styles.hint}>{hint}</Text>;
-  return null;
-}
-
-export type TextFieldProps = Omit<TextInputProps, 'style' | 'onFocus' | 'onBlur'> & {
+export type TextFieldProps = Omit<TextInputProps, 'style' | 'onFocus' | 'onBlur' | 'placeholder'> & {
+  /** Shown as the placeholder and read out by screen readers. */
   label: string;
   icon?: ComponentType<IconProps>;
   /** Rendered inside the field after the input, e.g. a show-password toggle. */
   trailing?: ReactNode;
   error?: string;
-  hint?: string;
 };
 
-export function TextField({ label, icon: Icon, trailing, error, hint, ...input }: TextFieldProps) {
+/** Icon, input and optional trailing control in one compact field. */
+export function TextField({ label, icon: Icon, trailing, error, ...input }: TextFieldProps) {
   const [focused, setFocused] = useState(false);
 
   return (
     <View>
-      <FieldLabel>{label}</FieldLabel>
-      <View style={[styles.field, focused && styles.focused, !!error && styles.invalid]}>
+      <View style={[styles.field, focused && fieldStyles.focused, !!error && fieldStyles.invalid]}>
         {Icon ? (
           <Icon
             size={20}
@@ -41,15 +35,16 @@ export function TextField({ label, icon: Icon, trailing, error, hint, ...input }
         ) : null}
         <TextInput
           {...input}
+          placeholder={label}
           placeholderTextColor={colors.placeholder}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           accessibilityLabel={label}
-          style={styles.input}
+          style={fieldStyles.input}
         />
         {trailing}
       </View>
-      <FieldMessage error={error} hint={hint} />
+      <FieldError error={error} />
     </View>
   );
 }
@@ -86,25 +81,15 @@ export const fieldStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  ...fieldStyles,
   field: {
     ...fieldStyles.field,
     gap: spacing.sm + 4,
     paddingHorizontal: controls.inputPaddingX,
   },
-  label: {
-    ...typography.titleSmall,
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
   error: {
     ...typography.bodySmall,
     color: colors.danger,
-    marginTop: spacing.sm,
-  },
-  hint: {
-    ...typography.bodySmall,
-    color: colors.textSubtle,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs + 2,
+    marginLeft: spacing.xs,
   },
 });

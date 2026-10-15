@@ -30,11 +30,10 @@ export function ForgotPasswordScreen() {
     >
       <View style={styles.form}>
         <TextField
-          label="Email"
+          label="Email address"
           icon={EnvelopeSimple}
           value={email}
           onChangeText={setEmail}
-          placeholder="you@example.com"
           keyboardType="email-address"
           autoComplete="email"
           textContentType="emailAddress"
@@ -54,6 +53,6 @@ export function ForgotPasswordScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    gap: spacing.lg,
+    gap: spacing.md,
   },
 });
