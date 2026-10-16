@@ -1,32 +1,42 @@
-import { useState, type ComponentType } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { ComponentType } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import {
+  Bell,
   CalendarBlank,
-  Car,
   Clock,
-  EnvelopeSimple,
+  ClockCounterClockwise,
+  Lifebuoy,
   MagnifyingGlass,
-  Phone,
-  SignOut,
   type IconProps,
 } from 'phosphor-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { signOut } from '@alansar/auth';
+import { describeError } from '@alansar/api';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
-import { formatBdPhone } from '@alansar/utils';
+import { initialsOf } from '@alansar/utils';
 
 import { Button } from '@/components/Button';
+import { MapArt } from '@/components/illustrations/MapArt';
+import { VehicleArt } from '@/components/illustrations/VehicleArt';
 import { Notice } from '@/components/Notice';
 import { PressableScale } from '@/components/PressableScale';
+import { Toast, useToast } from '@/components/Toast';
+import { useRideHistory, useVehicleAvailability } from '@/hooks/queries';
 import { useSession } from '@/hooks/useSession';
+import { RideRow } from '@/features/rides/RideRow';
+
+import { FareBanner } from './FareBanner';
+import { VehicleCard, VehicleCardSkeleton } from './VehicleCard';
 
 const { colors, spacing, radius, typography, shadows, controls } = lightTheme;
 
-const enter = (delay: number) => FadeInDown.delay(delay).duration(480);
+const BOOKING_NEXT = 'Booking a ride is the next screen we build.';
+
+const enter = (delay: number) => FadeInDown.delay(delay).duration(460);
 
 const greeting = () => {
   const hour = new Date().getHours();
@@ -35,119 +45,179 @@ const greeting = () => {
   return 'Good evening';
 };
 
-const initialsOf = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
-
-/** Signed-in home. Booking lands here next; for now it shows the account and what's coming. */
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const state = useSession();
-  const [bookingTapped, setBookingTapped] = useState(false);
+  const toast = useToast();
+  const vehicles = useVehicleAvailability();
+  const history = useRideHistory(3);
 
   if (state.status !== 'signedIn') return null;
-  const { user } = state;
-  const name = user.full_name?.trim() || 'there';
+  const name = state.user.full_name?.trim() || 'there';
+  const onlineTotal = (vehicles.data ?? []).reduce((sum, v) => sum + v.online_count, 0);
+  const rides = history.data?.items ?? [];
 
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}
-        bounces={false}
-      >
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <LinearGradient
           {...gradients.header}
           style={[styles.hero, { paddingTop: insets.top + spacing.md }]}
         >
-          <View style={[styles.orb, styles.orbTop]} />
+          <MapArt quiet />
 
-          <View style={styles.heroRow}>
+          <View style={styles.topRow}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{initialsOf(name) || '🙂'}</Text>
+              <Text style={styles.avatarText}>{initialsOf(name) || 'A'}</Text>
             </View>
-            <View style={styles.heroText}>
-              <Text style={styles.hello}>{greeting()}</Text>
-              <Text style={styles.name} numberOfLines={1}>
+            <View style={styles.hello}>
+              <Text style={styles.helloSmall}>{greeting()},</Text>
+              <Text style={styles.helloName} numberOfLines={1}>
                 {name.split(' ')[0]}
               </Text>
             </View>
             <PressableScale
               accessibilityRole="button"
-              accessibilityLabel="Log out"
+              accessibilityLabel="Notifications"
               hitSlop={8}
               style={styles.glassButton}
-              onPress={() => void signOut()}
+              onPress={() => toast.show('Notifications are coming soon.')}
             >
-              <SignOut size={20} color={onHero.text} weight="bold" />
+              <Bell size={20} color={onHero.text} weight="bold" />
             </PressableScale>
           </View>
+
+          <Animated.Text entering={enter(0)} style={styles.heroTitle}>
+            Where are you{'\n'}going today?
+          </Animated.Text>
+          {vehicles.data ? (
+            <Animated.View entering={enter(60)} style={styles.livePill}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>
+                {onlineTotal > 0
+                  ? `${onlineTotal} driver${onlineTotal === 1 ? '' : 's'} online near you`
+                  : 'No drivers online right now'}
+              </Text>
+            </Animated.View>
+          ) : null}
         </LinearGradient>
 
         <View style={styles.body}>
-          <Animated.View entering={enter(0)}>
+          <Animated.View entering={enter(100)}>
             <PressableScale
               accessibilityRole="button"
+              accessibilityLabel="Where to?"
               style={styles.search}
-              onPress={() => setBookingTapped(true)}
+              onPress={() => toast.show(BOOKING_NEXT)}
             >
-              <MagnifyingGlass size={22} color={colors.text} weight="bold" />
+              <View style={styles.searchIcon}>
+                <MagnifyingGlass size={20} color={colors.onPrimary} weight="bold" />
+              </View>
               <Text style={styles.searchText}>Where to?</Text>
               <View style={styles.nowChip}>
-                <Clock size={16} color={colors.text} />
+                <Clock size={15} color={colors.text} weight="bold" />
                 <Text style={styles.nowText}>Now</Text>
               </View>
             </PressableScale>
           </Animated.View>
 
-          {bookingTapped ? (
-            <Notice message="Booking a ride is the next screen we build." />
-          ) : null}
-
-          <Animated.View entering={enter(80)} style={styles.actions}>
-            <QuickAction icon={Car} label="Ride" onPress={() => setBookingTapped(true)} />
-            <QuickAction
-              icon={CalendarBlank}
-              label="Schedule"
-              onPress={() => setBookingTapped(true)}
+          <Animated.View entering={enter(160)} style={styles.shortcuts}>
+            <Shortcut icon={CalendarBlank} label="Schedule" onPress={() => toast.show(BOOKING_NEXT)} />
+            <Shortcut
+              icon={ClockCounterClockwise}
+              label="Activity"
+              onPress={() => router.navigate('/activity')}
+            />
+            <Shortcut
+              icon={Lifebuoy}
+              label="Support"
+              onPress={() => toast.show('Support chat is coming soon.')}
             />
           </Animated.View>
 
-          <Animated.View entering={enter(160)}>
-            <Text style={styles.sectionTitle}>Recent rides</Text>
+          <Animated.View entering={enter(220)}>
+            <SectionTitle title="Choose a ride" />
+            {vehicles.isError ? (
+              <Notice tone="error" message={describeError(vehicles.error)} />
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.vehicles}
+                style={styles.bleed}
+              >
+                {vehicles.data
+                  ? vehicles.data.map((v) => (
+                      <VehicleCard key={v.id} vehicle={v} onPress={() => toast.show(BOOKING_NEXT)} />
+                    ))
+                  : [0, 1, 2].map((i) => <VehicleCardSkeleton key={i} />)}
+              </ScrollView>
+            )}
+          </Animated.View>
+
+          <Animated.View entering={enter(280)}>
+            <FareBanner />
+          </Animated.View>
+
+          <Animated.View entering={enter(340)}>
+            <SectionTitle
+              title="Recent rides"
+              action={rides.length ? { label: 'See all', onPress: () => router.navigate('/activity') } : undefined}
+            />
             <View style={styles.card}>
-              <View style={styles.emptyIcon}>
-                <Car size={26} color={colors.primary} weight="duotone" />
-              </View>
-              <Text style={styles.emptyTitle}>No rides yet</Text>
-              <Text style={styles.emptyBody}>Your trips will show up here.</Text>
+              {history.isError ? (
+                <Notice tone="error" message={describeError(history.error)} />
+              ) : rides.length ? (
+                rides.map((ride, i) => (
+                  <View key={ride.id} style={i > 0 && styles.divider}>
+                    <RideRow ride={ride} />
+                  </View>
+                ))
+              ) : history.isPending ? (
+                <Text style={styles.muted}>Loading your rides…</Text>
+              ) : (
+                <View style={styles.empty}>
+                  <View style={styles.emptyArt}>
+                    <VehicleArt slug="car" width={96} />
+                  </View>
+                  <Text style={styles.emptyTitle}>Your first ride is a tap away</Text>
+                  <Text style={styles.emptyBody}>Trips you take will show up here.</Text>
+                  <View style={styles.emptyAction}>
+                    <Button label="Book a ride" onPress={() => toast.show(BOOKING_NEXT)} />
+                  </View>
+                </View>
+              )}
             </View>
-          </Animated.View>
-
-          <Animated.View entering={enter(240)}>
-            <Text style={styles.sectionTitle}>Your account</Text>
-            <View style={[styles.card, styles.accountCard]}>
-              {user.phone ? (
-                <AccountRow icon={Phone} value={formatBdPhone(user.phone)} />
-              ) : null}
-              {user.email ? <AccountRow icon={EnvelopeSimple} value={user.email} /> : null}
-            </View>
-          </Animated.View>
-
-          <Animated.View entering={enter(320)}>
-            <Button variant="outline" label="Log out" onPress={() => void signOut()} />
           </Animated.View>
         </View>
       </ScrollView>
+
+      <Toast toast={toast.toast} />
     </View>
   );
 }
 
-function QuickAction({
+function SectionTitle({
+  title,
+  action,
+}: {
+  title: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  return (
+    <View style={styles.sectionRow}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {action ? (
+        <Text style={styles.sectionAction} onPress={action.onPress} accessibilityRole="link">
+          {action.label}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+function Shortcut({
   icon: Icon,
   label,
   onPress,
@@ -157,23 +227,12 @@ function QuickAction({
   onPress: () => void;
 }) {
   return (
-    <PressableScale accessibilityRole="button" style={styles.action} onPress={onPress}>
-      <View style={styles.actionIcon}>
-        <Icon size={26} color={colors.primary} weight="duotone" />
+    <PressableScale accessibilityRole="button" style={styles.shortcut} onPress={onPress}>
+      <View style={styles.shortcutIcon}>
+        <Icon size={22} color={colors.brand} weight="duotone" />
       </View>
-      <Text style={styles.actionLabel}>{label}</Text>
+      <Text style={styles.shortcutLabel}>{label}</Text>
     </PressableScale>
-  );
-}
-
-function AccountRow({ icon: Icon, value }: { icon: ComponentType<IconProps>; value: string }) {
-  return (
-    <View style={styles.accountRow}>
-      <Icon size={20} color={colors.textSubtle} />
-      <Text style={styles.accountValue} numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
   );
 }
 
@@ -182,61 +241,81 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  scroll: {
+    paddingBottom: spacing.xl,
+  },
   hero: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl + spacing.lg,
     overflow: 'hidden',
   },
-  orb: {
-    position: 'absolute',
-    borderRadius: radius.pill,
-    backgroundColor: onHero.orb,
-  },
-  orbTop: {
-    width: 240,
-    height: 240,
-    top: -120,
-    right: -60,
-  },
-  heroRow: {
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.sm + 4,
   },
   avatar: {
-    width: 52,
-    height: 52,
+    width: 46,
+    height: 46,
     borderRadius: radius.pill,
     backgroundColor: onHero.glass,
-    borderWidth: controls.borderWidth,
-    borderColor: onHero.glassBorder,
+    borderWidth: 2,
+    borderColor: lightTheme.colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    ...typography.title,
+    ...typography.titleSmall,
     color: onHero.text,
   },
-  heroText: {
+  hello: {
     flex: 1,
   },
-  hello: {
-    ...typography.bodySmall,
+  helloSmall: {
+    ...typography.caption,
     color: onHero.textMuted,
   },
-  name: {
-    ...typography.headline,
+  helloName: {
+    ...typography.title,
     color: onHero.text,
   },
   glassButton: {
     width: 44,
     height: 44,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     backgroundColor: onHero.glass,
     borderWidth: controls.borderWidth,
     borderColor: onHero.glassBorder,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  heroTitle: {
+    ...typography.display,
+    color: onHero.text,
+    marginTop: spacing.lg,
+  },
+  livePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.sm,
+    marginTop: spacing.sm + 4,
+    paddingHorizontal: spacing.sm + 4,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: radius.pill,
+    backgroundColor: onHero.glass,
+    borderWidth: controls.borderWidth,
+    borderColor: onHero.glassBorder,
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: lightTheme.colors.brand,
+  },
+  liveText: {
+    ...typography.caption,
+    color: onHero.text,
   },
   body: {
     marginTop: -spacing.xl,
@@ -244,15 +323,23 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   search: {
-    height: 60,
+    height: 64,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm + 4,
-    paddingLeft: spacing.md + 4,
-    paddingRight: spacing.sm,
+    paddingLeft: spacing.sm + 2,
+    paddingRight: spacing.sm + 2,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
     boxShadow: shadows.raised,
+  },
+  searchIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchText: {
     ...typography.title,
@@ -262,64 +349,99 @@ const styles = StyleSheet.create({
   nowChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm + 4,
+    gap: spacing.xs + 1,
     height: 40,
-    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm + 4,
+    borderRadius: radius.md,
     backgroundColor: colors.background,
   },
   nowText: {
     ...typography.titleSmall,
     color: colors.text,
   },
-  actions: {
+  shortcuts: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.sm + 4,
   },
-  action: {
+  shortcut: {
     flex: 1,
     alignItems: 'center',
     gap: spacing.sm,
     paddingVertical: spacing.md,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     boxShadow: shadows.card,
   },
-  actionIcon: {
-    width: 52,
-    height: 52,
+  shortcutIcon: {
+    width: 44,
+    height: 44,
     borderRadius: radius.md,
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.brandTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionLabel: {
-    ...typography.titleSmall,
+  shortcutLabel: {
+    ...typography.caption,
     color: colors.text,
+  },
+  sectionRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm + 4,
   },
   sectionTitle: {
-    ...typography.title,
+    ...typography.headline,
     color: colors.text,
-    marginBottom: spacing.sm + 4,
+  },
+  sectionAction: {
+    ...typography.titleSmall,
+    color: colors.brandStrong,
+  },
+  // Let the carousel run to the screen edges while its first card lines up with the page.
+  bleed: {
+    marginHorizontal: -spacing.lg,
+  },
+  vehicles: {
+    gap: spacing.sm + 4,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xs,
   },
   card: {
-    alignItems: 'center',
-    padding: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     boxShadow: shadows.card,
   },
-  emptyIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.pill,
-    backgroundColor: colors.primaryTint,
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSubtle,
+  },
+  muted: {
+    ...typography.bodySmall,
+    color: colors.textSubtle,
+    paddingVertical: spacing.md,
+  },
+  empty: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+  },
+  emptyArt: {
+    width: 128,
+    height: 76,
+    borderRadius: radius.lg,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm + 4,
+    marginBottom: spacing.md,
   },
   emptyTitle: {
-    ...typography.titleSmall,
+    ...typography.title,
     color: colors.text,
   },
   emptyBody: {
@@ -327,19 +449,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: spacing.xs,
   },
-  accountCard: {
-    alignItems: 'stretch',
-    gap: spacing.md,
-    paddingVertical: spacing.md + 4,
-  },
-  accountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 4,
-  },
-  accountValue: {
-    ...typography.body,
-    flex: 1,
-    color: colors.text,
+  emptyAction: {
+    alignSelf: 'stretch',
+    marginTop: spacing.md + 4,
   },
 });

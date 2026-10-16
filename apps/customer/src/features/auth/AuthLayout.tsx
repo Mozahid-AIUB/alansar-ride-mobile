@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
 
 import { BackButton } from '@/components/BackButton';
+import { MapArt } from '@/components/illustrations/MapArt';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
@@ -40,8 +41,7 @@ export function AuthLayout({ title, subtitle, children }: Props) {
         {...gradients.header}
         style={[styles.hero, { paddingTop: insets.top + spacing.sm }]}
       >
-        <View style={[styles.orb, styles.orbTop]} />
-        <View style={[styles.orb, styles.orbBottom]} />
+        <MapArt quiet />
 
         <View style={styles.topRow}>
           <BackButton tone="onHero" />
@@ -81,23 +81,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: radius.xl + spacing.sm + 4,
     overflow: 'hidden',
-  },
-  orb: {
-    position: 'absolute',
-    borderRadius: radius.pill,
-    backgroundColor: onHero.orb,
-  },
-  orbTop: {
-    width: 240,
-    height: 240,
-    top: -120,
-    right: -70,
-  },
-  orbBottom: {
-    width: 140,
-    height: 140,
-    bottom: -60,
-    left: -50,
   },
   topRow: {
     flexDirection: 'row',

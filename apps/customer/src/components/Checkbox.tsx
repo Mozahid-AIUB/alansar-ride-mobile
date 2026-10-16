@@ -5,7 +5,7 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import { lightTheme } from '@alansar/theme';
 
-const { colors, radius, spacing, typography, controls } = lightTheme;
+const { colors, spacing, typography, controls } = lightTheme;
 
 type Props = {
   checked: boolean;
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   box: {
     width: 22,
     height: 22,
-    borderRadius: radius.sm - 4,
+    borderRadius: 6,
     borderWidth: controls.focusBorderWidth,
     borderColor: colors.disabled,
     backgroundColor: colors.surface,
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checked: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
+    borderColor: colors.brand,
+    backgroundColor: colors.brand,
   },
   label: {
     ...typography.bodySmall,

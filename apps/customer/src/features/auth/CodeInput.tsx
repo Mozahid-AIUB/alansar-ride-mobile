@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 
-import { lightTheme } from '@alansar/theme';
+import { fonts, lightTheme } from '@alansar/theme';
 
 const { colors, radius, spacing, controls } = lightTheme;
 
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   active: {
-    borderColor: colors.primary,
+    borderColor: colors.brand,
     borderWidth: controls.focusBorderWidth,
     backgroundColor: colors.surface,
   },
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
     borderColor: colors.danger,
   },
   digit: {
+    fontFamily: fonts.bold,
     fontSize: 24,
-    fontWeight: '700',
     color: colors.text,
   },
   hiddenInput: {

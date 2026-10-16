@@ -2,7 +2,7 @@ import { useState, type ComponentType, type ReactNode } from 'react';
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import type { IconProps } from 'phosphor-react-native';
 
-import { lightTheme } from '@alansar/theme';
+import { fonts, lightTheme } from '@alansar/theme';
 
 const { colors, radius, spacing, typography, controls } = lightTheme;
 
@@ -29,7 +29,7 @@ export function TextField({ label, icon: Icon, trailing, error, ...input }: Text
         {Icon ? (
           <Icon
             size={20}
-            color={focused ? colors.primary : colors.placeholder}
+            color={focused ? colors.brand : colors.placeholder}
             weight={focused ? 'duotone' : 'regular'}
           />
         ) : null}
@@ -61,7 +61,7 @@ export const fieldStyles = StyleSheet.create({
     backgroundColor: colors.inputFill,
   },
   focused: {
-    borderColor: colors.primary,
+    borderColor: colors.brand,
     borderWidth: controls.focusBorderWidth,
     backgroundColor: colors.surface,
   },
@@ -71,6 +71,7 @@ export const fieldStyles = StyleSheet.create({
   input: {
     flex: 1,
     height: '100%',
+    fontFamily: fonts.medium,
     fontSize: 16,
     color: colors.text,
     // The field's border shows focus. On web, a zero-width solid outline

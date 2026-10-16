@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 
-import { lightTheme, onHero } from '@alansar/theme';
+import { fonts, lightTheme, onHero } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
 import { GoogleLogo } from '@/components/GoogleLogo';
@@ -123,15 +123,15 @@ const styles = StyleSheet.create({
   },
   link: {
     ...typography.titleSmall,
-    color: colors.primary,
+    color: colors.brandStrong,
   },
   inlineLink: {
-    color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
+    color: colors.brandStrong,
   },
   heroStrong: {
+    fontFamily: fonts.bold,
     color: onHero.text,
-    fontWeight: '700',
   },
   muted: {
     ...typography.bodySmall,

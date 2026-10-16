@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { gradients, lightTheme, onHero } from '@alansar/theme';
 
+import { MapArt } from '@/components/illustrations/MapArt';
 import { PressableScale } from '@/components/PressableScale';
 
 const { colors, spacing, radius, typography, controls, shadows } = lightTheme;
@@ -38,8 +39,7 @@ export function WelcomeScreen() {
       <StatusBar style="light" />
 
       <LinearGradient {...gradients.header} style={[styles.hero, { paddingTop: insets.top }]}>
-        <View style={[styles.orb, styles.orbTop]} />
-        <View style={[styles.orb, styles.orbBottom]} />
+        <MapArt />
 
         <Animated.View entering={ZoomIn.duration(600).springify()} style={styles.logoTile}>
           <Image source={logo} style={styles.logo} contentFit="contain" />
@@ -64,7 +64,7 @@ export function WelcomeScreen() {
           {highlights.map(({ icon: Icon, title, body }, i) => (
             <Animated.View key={title} entering={enter(440 + i * 80)} style={styles.highlight}>
               <View style={styles.iconChip}>
-                <Icon size={22} color={colors.primary} weight="duotone" />
+                <Icon size={22} color={colors.brand} weight="duotone" />
               </View>
               <View style={styles.highlightText}>
                 <Text style={styles.highlightTitle}>{title}</Text>
@@ -106,23 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: radius.xl,
     overflow: 'hidden',
-  },
-  orb: {
-    position: 'absolute',
-    borderRadius: radius.pill,
-    backgroundColor: onHero.orb,
-  },
-  orbTop: {
-    width: 320,
-    height: 320,
-    top: -120,
-    right: -110,
-  },
-  orbBottom: {
-    width: 220,
-    height: 220,
-    bottom: -40,
-    left: -90,
   },
   logoTile: {
     width: 104,
@@ -180,7 +163,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radius.md,
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.brandTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -198,7 +181,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     height: controls.buttonHeight,
-    borderRadius: radius.pill,
+    borderRadius: controls.buttonRadius,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,6 +206,6 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     ...typography.titleSmall,
-    color: colors.primary,
+    color: colors.brandStrong,
   },
 });

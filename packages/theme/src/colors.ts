@@ -1,36 +1,33 @@
 /**
- * Colour tokens, ported from the Flutter app
- * (lib/core/theme/app_theme.dart → AppColors and BookingColors).
- *
- * Light theme is the blue system: blue gradient header, deep-blue primary
- * actions, white cards on a cool off-white canvas. Dark theme is the booking-flow
- * palette from the approved mockups.
- *
- * Open design question: in light mode the primary action is blue, in dark mode
- * it is green (the mockup's accent). That was fine while dark only covered the
- * three booking screens; decide on one before making dark mode app-wide.
+ * Colour tokens. The brand comes straight from the logo: a near-black navy
+ * ("ink") and a lime-to-forest green. Ink carries the primary actions and the
+ * header, Uber-style; green marks the brand moments — focus, links, routes,
+ * availability.
  */
 
 /** Raw ramps. Components should use `lightColors` / `darkColors` instead. */
 export const palette = {
-  brand50: '#EFF5FB',
-  brand100: '#DCE9F6',
-  brand200: '#BBD3EC',
-  brand300: '#8DB5DE',
-  brand400: '#5B93CB',
-  brand500: '#1B5C9E',
-  brand600: '#175291',
-  brand700: '#12406F',
+  ink950: '#0A1218',
+  ink900: '#0F1B24',
+  ink800: '#16242F',
+  ink700: '#213240',
+  ink500: '#4F5E69',
+  ink400: '#7A8893',
+  ink300: '#9BA7B0',
+  ink200: '#C8D0D6',
+  ink150: '#E2E7EB',
+  ink100: '#EEF1F4',
+  ink50: '#F5F7F8',
 
-  /** Lighter blue at the top-left of the header gradient. */
-  sunrise: '#3E7CB2',
+  /** The bright end of the logo's green. */
+  lime: '#7CC21F',
+  green400: '#3FAE45',
+  green500: '#23963A',
+  /** Dark enough (≥ 4.5:1 on white) for green text. */
+  green600: '#1B7E30',
+  green700: '#14612A',
+  green50: '#EAF6E7',
 
-  /** Near-black navy for headings. */
-  ink: '#13273D',
-  inkSoft: '#1E3A56',
-  inkMuted: '#6B8095',
-
-  canvas: '#F1F3F5',
   white: '#FFFFFF',
 
   // Status colours are a contract with the admin panel: a "cancelled" ride
@@ -40,26 +37,15 @@ export const palette = {
   warning: '#F5A623',
   danger: '#EF4444',
   star: '#F5A623',
-
-  gray50: '#F9FAFB',
-  gray100: '#F3F4F6',
-  gray200: '#E5E7EB',
-  gray300: '#D1D5DB',
   gray400: '#9CA3AF',
-  gray500: '#6B7280',
-  gray600: '#4B5563',
-  gray700: '#374151',
-  gray900: '#111827',
 
-  // Booking-flow dark mockup.
+  // Dark theme surfaces.
   night900: '#0E1116',
   night800: '#10141B',
   night700: '#171B22',
   night600: '#1D222B',
   night500: '#232833',
   night400: '#262C36',
-  mint: '#3AC48C',
-  coral: '#FF6B57',
   snow: '#F4F5F7',
   mist400: '#8A9099',
   mist500: '#6B7078',
@@ -78,18 +64,22 @@ export type ThemeColors = {
   textMuted: string;
   textSubtle: string;
   placeholder: string;
+  /** The main call to action. */
   primary: string;
   onPrimary: string;
-  /** Tinted chip behind a primary-coloured icon. */
   primaryTint: string;
-  /** Destination pins and markers only — never a button colour. */
+  /** Brand green for focus, links, routes and availability. */
+  brand: string;
+  /** Brand green dark enough for text. */
+  brandStrong: string;
+  brandTint: string;
+  /** Destination pins and markers. */
   accent: string;
   accentTint: string;
   pickup: string;
   dropoff: string;
   inputFill: string;
   disabled: string;
-  /** Background for an error or success notice. */
   dangerTint: string;
   successTint: string;
   success: string;
@@ -108,27 +98,30 @@ const status = {
 };
 
 export const lightColors: ThemeColors = {
-  background: palette.canvas,
-  backgroundAlt: palette.gray50,
+  background: palette.ink50,
+  backgroundAlt: palette.ink100,
   surface: palette.white,
-  surfaceAlt: palette.brand50,
-  border: palette.gray200,
-  borderSubtle: palette.gray100,
-  text: palette.ink,
-  textMuted: palette.gray600,
-  textSubtle: palette.gray500,
-  placeholder: palette.gray400,
-  primary: palette.brand500,
+  surfaceAlt: palette.ink100,
+  border: palette.ink150,
+  borderSubtle: palette.ink100,
+  text: palette.ink900,
+  textMuted: palette.ink500,
+  textSubtle: palette.ink400,
+  placeholder: palette.ink300,
+  primary: palette.ink900,
   onPrimary: palette.white,
-  primaryTint: palette.brand50,
-  accent: palette.brand500,
-  accentTint: palette.brand100,
-  pickup: palette.ink,
-  dropoff: palette.brand500,
-  inputFill: palette.gray50,
-  disabled: palette.gray300,
+  primaryTint: palette.ink100,
+  brand: palette.green500,
+  brandStrong: palette.green600,
+  brandTint: palette.green50,
+  accent: palette.danger,
+  accentTint: 'rgba(239, 68, 68, 0.10)',
+  pickup: palette.green500,
+  dropoff: palette.ink900,
+  inputFill: palette.ink50,
+  disabled: palette.ink200,
   dangerTint: 'rgba(239, 68, 68, 0.08)',
-  successTint: 'rgba(34, 197, 94, 0.10)',
+  successTint: 'rgba(35, 150, 58, 0.10)',
   ...status,
 };
 
@@ -143,41 +136,48 @@ export const darkColors: ThemeColors = {
   textMuted: palette.mist400,
   textSubtle: palette.mist500,
   placeholder: palette.mist600,
-  primary: palette.mint,
-  // Near-black on mint, not white — the mockup's high-contrast choice.
-  onPrimary: palette.night900,
-  primaryTint: 'rgba(58, 196, 140, 0.16)',
-  accent: palette.coral,
-  accentTint: 'rgba(255, 107, 87, 0.16)',
-  pickup: palette.mint,
-  dropoff: palette.coral,
+  primary: palette.green400,
+  onPrimary: palette.ink950,
+  primaryTint: 'rgba(63, 174, 69, 0.16)',
+  brand: palette.green400,
+  brandStrong: palette.lime,
+  brandTint: 'rgba(63, 174, 69, 0.16)',
+  accent: palette.danger,
+  accentTint: 'rgba(239, 68, 68, 0.16)',
+  pickup: palette.green400,
+  dropoff: palette.snow,
   inputFill: palette.night600,
   disabled: palette.night400,
   dangerTint: 'rgba(239, 68, 68, 0.16)',
-  successTint: 'rgba(34, 197, 94, 0.16)',
+  successTint: 'rgba(63, 174, 69, 0.16)',
   ...status,
 };
 
-/** White overlays for content sitting on the blue header gradient. */
+/** Overlays for content sitting on the ink header. */
 export const onHero = {
   text: palette.white,
-  textMuted: 'rgba(255, 255, 255, 0.78)',
-  orb: 'rgba(255, 255, 255, 0.08)',
-  /** Frosted control surface, e.g. the back button on the header. */
-  glass: 'rgba(255, 255, 255, 0.16)',
-  glassBorder: 'rgba(255, 255, 255, 0.28)',
+  textMuted: 'rgba(255, 255, 255, 0.70)',
+  /** Body copy on a coloured banner. */
+  textSoft: 'rgba(255, 255, 255, 0.88)',
+  orb: 'rgba(255, 255, 255, 0.05)',
+  /** Frosted control surface, e.g. the back button. */
+  glass: 'rgba(255, 255, 255, 0.10)',
+  glassBorder: 'rgba(255, 255, 255, 0.16)',
+  /** Streets and blocks in the map illustration. */
+  street: 'rgba(255, 255, 255, 0.07)',
+  block: 'rgba(255, 255, 255, 0.035)',
 } as const;
 
 /** For expo-linear-gradient: `<LinearGradient {...gradients.header} />`. */
 export const gradients = {
   header: {
-    colors: [palette.sunrise, palette.brand500],
+    colors: [palette.ink950, palette.ink800],
     start: { x: 0, y: 0 },
     end: { x: 1, y: 1 },
   },
-  cardWash: {
-    colors: [palette.brand50, palette.white],
-    start: { x: 1, y: 0 },
-    end: { x: 0, y: 1 },
+  brand: {
+    colors: [palette.lime, palette.green600],
+    start: { x: 0, y: 0 },
+    end: { x: 1, y: 1 },
   },
 } as const;

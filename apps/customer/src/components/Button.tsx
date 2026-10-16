@@ -5,7 +5,7 @@ import { lightTheme } from '@alansar/theme';
 
 import { PressableScale } from './PressableScale';
 
-const { colors, radius, spacing, typography, controls, shadows } = lightTheme;
+const { colors, spacing, typography, controls, shadows } = lightTheme;
 
 type Props = {
   label: string;
@@ -61,7 +61,7 @@ export function Button({
 const styles = StyleSheet.create({
   base: {
     height: controls.buttonHeight,
-    borderRadius: radius.pill,
+    borderRadius: controls.buttonRadius,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

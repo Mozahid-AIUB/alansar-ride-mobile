@@ -1,4 +1,4 @@
-/** Spacing, radius, shadows and control sizes, ported from the Flutter app. */
+/** Spacing, radius, shadows and control sizes. Corners are crisp rather than pill-round. */
 
 export const spacing = {
   xs: 4,
@@ -9,29 +9,25 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  sm: 10,
-  md: 14,
-  lg: 20,
-  xl: 28,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
   pill: 999,
 } as const;
 
-/**
- * The one soft shadow used on every raised surface, as a `boxShadow` style
- * value (React Native New Architecture).
- */
+/** `boxShadow` values (React Native New Architecture). Tight and low, like print. */
 export const shadows = {
-  card: '0px 6px 18px rgba(16, 16, 20, 0.05)',
-  raised: '0px 12px 28px rgba(16, 16, 20, 0.10)',
+  card: '0px 1px 2px rgba(15, 27, 36, 0.06), 0px 4px 14px rgba(15, 27, 36, 0.06)',
+  raised: '0px 2px 6px rgba(15, 27, 36, 0.08), 0px 14px 34px rgba(15, 27, 36, 0.14)',
 } as const;
 
 export const controls = {
-  /** Primary and outlined buttons are full-width pills of this height. */
   buttonHeight: 56,
+  buttonRadius: 14,
   /** Text fields sit a little lower than buttons so long forms fit one screen. */
   inputHeight: 52,
   inputPaddingX: spacing.md,
-  inputPaddingY: 18,
   borderWidth: 1,
   focusBorderWidth: 1.6,
 } as const;

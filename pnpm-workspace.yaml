@@ -8,3 +8,5 @@ minimumReleaseAgeExclude:
   - babel-preset-expo@57.0.16
   - expo-router@57.0.28
   - expo@57.0.30
+  - '@tanstack/query-core@5.104.3'
+  - '@tanstack/react-query@5.104.3'

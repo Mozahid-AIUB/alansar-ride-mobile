@@ -9,9 +9,9 @@ const { colors, radius, spacing, typography } = lightTheme;
 type Tone = 'info' | 'error' | 'success';
 
 const TONES = {
-  info: { icon: Info, color: colors.primary, background: colors.surfaceAlt },
+  info: { icon: Info, color: colors.text, background: colors.surfaceAlt },
   error: { icon: WarningCircle, color: colors.danger, background: colors.dangerTint },
-  success: { icon: CheckCircle, color: colors.success, background: colors.successTint },
+  success: { icon: CheckCircle, color: colors.brand, background: colors.successTint },
 } as const;
 
 /** Inline message box, e.g. a failed sign-in or a "code sent" confirmation. */

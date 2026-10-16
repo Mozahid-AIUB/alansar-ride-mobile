@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 import { configureApi } from '@alansar/api';
-import { session } from '@alansar/auth';
+import { refreshAccessToken, session } from '@alansar/auth';
 
 const PRODUCTION_API = 'https://api.alansartaxi.com';
 
@@ -18,5 +18,5 @@ export const API_URL =
     : (process.env.EXPO_PUBLIC_API_URL ?? PRODUCTION_API);
 
 export function setUpApi() {
-  configureApi({ baseUrl: API_URL, getAccessToken: session.accessToken });
+  configureApi({ baseUrl: API_URL, getAccessToken: session.accessToken, refreshAccessToken });
 }

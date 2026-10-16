@@ -55,6 +55,34 @@ export async function signOut() {
   setState({ status: 'signedOut' });
 }
 
+const rejected = (err: unknown) =>
+  err instanceof ApiError && (err.status === 401 || err.status === 403);
+
+let refreshing: Promise<string | undefined> | null = null;
+
+/**
+ * Swap the refresh token for a new access token; used by the API client when a
+ * request comes back 401. Concurrent callers share one refresh.
+ */
+export function refreshAccessToken(): Promise<string | undefined> {
+  if (state.status !== 'signedIn') return Promise.resolve(undefined);
+  const { refreshToken } = state.tokens;
+  refreshing ??= authApi
+    .refresh(refreshToken)
+    .then(async (fresh) => {
+      await signIn(fresh);
+      return fresh.tokens.accessToken;
+    })
+    .catch(async (err) => {
+      if (rejected(err)) await signOut();
+      return undefined;
+    })
+    .finally(() => {
+      refreshing = null;
+    });
+  return refreshing;
+}
+
 const readSaved = async (): Promise<{ user: User; tokens: Tokens } | null> => {
   try {
     const raw = await storage?.get(STORAGE_KEY);
@@ -82,6 +110,6 @@ export async function restoreSession(store: SessionStorage) {
   try {
     await signIn(await authApi.refresh(saved.tokens.refreshToken));
   } catch (err) {
-    if (err instanceof ApiError && (err.status === 401 || err.status === 403)) await signOut();
+    if (rejected(err)) await signOut();
   }
 }

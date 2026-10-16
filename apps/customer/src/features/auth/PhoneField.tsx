@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { lightTheme } from '@alansar/theme';
+import { fonts, lightTheme } from '@alansar/theme';
 import { bdSignificantDigits, formatBdSignificant } from '@alansar/utils';
 
 import { FieldError, fieldStyles } from '@/components/TextField';
@@ -72,5 +72,7 @@ const styles = StyleSheet.create({
   },
   input: {
     paddingHorizontal: spacing.md,
+    fontFamily: fonts.semibold,
+    letterSpacing: 0.3,
   },
 });
