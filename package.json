@@ -6,7 +6,8 @@
     "driver": "pnpm --filter @alansar/driver start",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "api-proxy": "node scripts/dev-api-proxy.mjs"
   },
   "engines": {
     "node": ">=20"

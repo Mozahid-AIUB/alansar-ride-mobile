@@ -25,7 +25,8 @@ All on the existing VPS (Coolify). Only the mobile apps are being rewritten.
 | Server state | TanStack Query | Caching, retries, background refetch |
 | Client state | Zustand | Small; replaces the Provider + Riverpod mix |
 | Forms | react-hook-form + zod | Phone/email validation rules live in one schema |
-| HTTP | axios | Interceptors for auth and the API's response envelope |
+| HTTP | fetch wrapper in `packages/api` | No dependency; unwraps the API's `{ success, data / error }` envelope into `ApiError` |
+| Session | Small external store in `packages/auth`, read with `useSyncExternalStore` | Tokens in expo-secure-store; no React or store library inside shared packages |
 | Realtime | socket.io-client | Same server as today |
 | Maps | react-native-maps (Google) | Routes still come from `GET /api/rides/route` |
 | Location | expo-location + expo-task-manager | Driver background tracking |

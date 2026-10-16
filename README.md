@@ -23,6 +23,13 @@ pnpm customer        # Expo dev server for the customer app
 
 Then press `w` for the browser, or open it on a phone with Expo Go (same Wi-Fi).
 
+The app talks to the production API. Phones call it directly; the browser preview can't
+(the API's CORS only allows its own sites), so run the dev proxy alongside it:
+
+```
+pnpm api-proxy       # http://localhost:8787 -> https://api.alansartaxi.com
+```
+
 ## Structure
 
 ```
@@ -68,5 +75,6 @@ alansar-ride-mobile/
 
 ## Status
 
-- Customer app runs: welcome screen and a placeholder sign-in screen.
+- Customer app: Welcome, Log in, Sign up (emailed code), Forgot / Reset password, and a Home
+  dashboard, all against the live API. Google sign-in waits on Firebase.
 - Driver app: structure only.

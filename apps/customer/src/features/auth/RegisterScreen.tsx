@@ -3,12 +3,14 @@ import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { EnvelopeSimple, User } from 'phosphor-react-native';
 
-import { authReady } from '@alansar/auth';
+import { authApi, describeError } from '@alansar/api';
+import { googleReady, signIn } from '@alansar/auth';
 import { lightTheme } from '@alansar/theme';
 import { isValidBdMobile, isValidEmail, PASSWORD_MIN, toE164Bd } from '@alansar/utils';
 
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { Notice } from '@/components/Notice';
 import { PasswordField } from '@/components/PasswordField';
 import { TextField } from '@/components/TextField';
 
@@ -22,13 +24,12 @@ import {
   SwitchPrompt,
 } from './AuthParts';
 import { PhoneField } from './PhoneField';
-import { PreviewNotice } from './PreviewNotice';
 
 const { spacing } = lightTheme;
 
 /**
- * Nothing here creates an account: the API holds the details and emails a
- * code, and the account only exists once that code is verified on the next screen.
+ * Sign-up step 1. The API only holds these details (pending_registrations) and
+ * emails a code; the account is created when that code is verified.
  */
 export function RegisterScreen() {
   const [name, setName] = useState('');
@@ -37,6 +38,8 @@ export function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [googleTapped, setGoogleTapped] = useState(false);
 
   const phoneValid = isValidBdMobile(phone);
@@ -50,9 +53,32 @@ export function RegisterScreen() {
     confirm === password &&
     agreed;
 
-  const onSubmit = () => {
-    if (!canSubmit) return;
-    router.push({ pathname: '/verify', params: { email: email.trim(), phone: toE164Bd(phone) } });
+  const onSubmit = async () => {
+    if (!canSubmit || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await authApi.register({
+        fullName: name.trim(),
+        email: email.trim(),
+        phone: toE164Bd(phone),
+        password,
+        role: 'customer',
+      });
+      if (!result.otpRequired) {
+        // The operator has switched codes off: the account already exists.
+        await signIn(result);
+        return;
+      }
+      router.push({
+        pathname: '/verify',
+        params: { email: result.email, sent: result.sent ? '1' : '0' },
+      });
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -108,12 +134,19 @@ export function RegisterScreen() {
           I agree to the <LegalLinks short />
         </Checkbox>
 
-        <Button label="Create account" disabled={!canSubmit} onPress={onSubmit} />
+        {error ? <Notice tone="error" message={error} /> : null}
+
+        <Button
+          label="Create account"
+          disabled={!canSubmit}
+          loading={busy}
+          onPress={() => void onSubmit()}
+        />
 
         <OrDivider label="or" />
         <GoogleButton label="Sign up with Google" onPress={() => setGoogleTapped(true)} />
-        {googleTapped && !authReady ? (
-          <PreviewNotice message="Preview: Google sign-up needs Firebase, which isn't set up yet." />
+        {googleTapped && !googleReady ? (
+          <Notice message="Google sign-up needs Firebase, which isn't set up on the server yet." />
         ) : null}
 
         <SwitchPrompt

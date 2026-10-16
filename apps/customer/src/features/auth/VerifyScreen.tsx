@@ -2,25 +2,61 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
-import { authReady } from '@alansar/auth';
+import { authApi, describeError } from '@alansar/api';
+import { signIn } from '@alansar/auth';
 import { lightTheme } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
+import { Notice } from '@/components/Notice';
 
 import { AuthLayout } from './AuthLayout';
 import { HeroStrong, ResendCode, TextLink } from './AuthParts';
 import { CodeInput } from './CodeInput';
-import { PreviewNotice } from './PreviewNotice';
 
 const { spacing } = lightTheme;
 
 const CODE_LENGTH = 6;
 
+type Message = { tone: 'error' | 'success'; text: string } | null;
+
 /** Sign-up step 2: the emailed code. The account is created only when this succeeds. */
 export function VerifyScreen() {
-  const { email = '' } = useLocalSearchParams<{ email?: string; phone?: string }>();
+  const { email = '', sent } = useLocalSearchParams<{ email?: string; sent?: string }>();
   const [code, setCode] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<Message>(
+    sent === '0'
+      ? { tone: 'error', text: "We couldn't send the email. Check the address, or tap Resend code." }
+      : null,
+  );
+
+  const onVerify = async () => {
+    if (code.length < CODE_LENGTH || busy) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      // The root layout's guard sends a signed-in user to Home.
+      await signIn(await authApi.verifyRegistration(email, code));
+    } catch (err) {
+      setMessage({ tone: 'error', text: describeError(err) });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onResend = async () => {
+    setMessage(null);
+    try {
+      const result = await authApi.resendRegistrationCode(email);
+      setMessage(
+        result.sent
+          ? { tone: 'success', text: `A new code is on its way to ${email}.` }
+          : { tone: 'error', text: "We couldn't send the email. Please try again in a minute." },
+      );
+    } catch (err) {
+      setMessage({ tone: 'error', text: describeError(err) });
+    }
+  };
 
   return (
     <AuthLayout
@@ -34,26 +70,19 @@ export function VerifyScreen() {
       <CodeInput value={code} onChange={setCode} length={CODE_LENGTH} />
 
       <View style={styles.row}>
-        <ResendCode />
+        <ResendCode seconds={60} onResend={() => void onResend()} />
         <TextLink label="Change email" onPress={() => router.back()} />
       </View>
 
-      {!authReady ? (
-        <PreviewNotice
-          message={
-            submitted
-              ? 'Preview: in the live app this creates your account and logs you in.'
-              : 'Preview: no email was sent. Real codes are checked once the app is connected to the server.'
-          }
-        />
-      ) : null}
+      {message ? <Notice tone={message.tone} message={message.text} /> : null}
 
       <View style={styles.spacer} />
 
       <Button
         label="Verify and create account"
         disabled={code.length < CODE_LENGTH}
-        onPress={() => setSubmitted(true)}
+        loading={busy}
+        onPress={() => void onVerify()}
       />
     </AuthLayout>
   );
@@ -64,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing.md,
   },
   spacer: {
     flex: 1,

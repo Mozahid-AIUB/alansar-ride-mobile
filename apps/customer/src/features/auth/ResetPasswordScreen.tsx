@@ -2,21 +2,23 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
-import { authReady } from '@alansar/auth';
+import { authApi, describeError } from '@alansar/api';
 import { lightTheme } from '@alansar/theme';
 import { PASSWORD_MIN } from '@alansar/utils';
 
 import { Button } from '@/components/Button';
+import { Notice } from '@/components/Notice';
 import { PasswordField } from '@/components/PasswordField';
 
 import { AuthLayout } from './AuthLayout';
 import { HeroStrong, ResendCode, TextLink } from './AuthParts';
 import { CodeInput } from './CodeInput';
-import { PreviewNotice } from './PreviewNotice';
 
 const { spacing } = lightTheme;
 
 const CODE_LENGTH = 6;
+
+type Message = { tone: 'error' | 'success'; text: string } | null;
 
 /** Forgot password, step 2: the emailed code and the new password, sent together. */
 export function ResetPasswordScreen() {
@@ -24,11 +26,36 @@ export function ResetPasswordScreen() {
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<Message>(null);
 
   const mismatch = confirm !== '' && confirm !== password;
   const canSubmit =
     code.length === CODE_LENGTH && password.length >= PASSWORD_MIN && confirm === password;
+
+  const onReset = async () => {
+    if (!canSubmit || busy) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      await authApi.resetPassword(email, code, password);
+      router.replace({ pathname: '/login', params: { notice: 'password-reset' } });
+    } catch (err) {
+      setMessage({ tone: 'error', text: describeError(err) });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onResend = async () => {
+    setMessage(null);
+    try {
+      await authApi.forgotPassword(email);
+      setMessage({ tone: 'success', text: `If ${email} has an account, a new code is on its way.` });
+    } catch (err) {
+      setMessage({ tone: 'error', text: describeError(err) });
+    }
+  };
 
   return (
     <AuthLayout
@@ -42,7 +69,7 @@ export function ResetPasswordScreen() {
       <CodeInput value={code} onChange={setCode} length={CODE_LENGTH} />
 
       <View style={styles.row}>
-        <ResendCode />
+        <ResendCode seconds={60} onResend={() => void onResend()} />
         <TextLink label="Change email" onPress={() => router.back()} />
       </View>
 
@@ -64,21 +91,20 @@ export function ResetPasswordScreen() {
         />
       </View>
 
-      {!authReady ? (
+      {message ? (
         <View style={styles.notice}>
-          <PreviewNotice
-            message={
-              submitted
-                ? 'Preview: in the live app this saves your new password and takes you to Log in.'
-                : 'Preview: no email was sent. Real codes are checked once the app is connected to the server.'
-            }
-          />
+          <Notice tone={message.tone} message={message.text} />
         </View>
       ) : null}
 
       <View style={styles.spacer} />
 
-      <Button label="Reset password" disabled={!canSubmit} onPress={() => setSubmitted(true)} />
+      <Button
+        label="Reset password"
+        disabled={!canSubmit}
+        loading={busy}
+        onPress={() => void onReset()}
+      />
     </AuthLayout>
   );
 }

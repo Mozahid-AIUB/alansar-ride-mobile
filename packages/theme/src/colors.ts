@@ -89,6 +89,9 @@ export type ThemeColors = {
   dropoff: string;
   inputFill: string;
   disabled: string;
+  /** Background for an error or success notice. */
+  dangerTint: string;
+  successTint: string;
   success: string;
   info: string;
   warning: string;
@@ -124,6 +127,8 @@ export const lightColors: ThemeColors = {
   dropoff: palette.brand500,
   inputFill: palette.gray50,
   disabled: palette.gray300,
+  dangerTint: 'rgba(239, 68, 68, 0.08)',
+  successTint: 'rgba(34, 197, 94, 0.10)',
   ...status,
 };
 
@@ -148,6 +153,8 @@ export const darkColors: ThemeColors = {
   dropoff: palette.coral,
   inputFill: palette.night600,
   disabled: palette.night400,
+  dangerTint: 'rgba(239, 68, 68, 0.16)',
+  successTint: 'rgba(34, 197, 94, 0.16)',
   ...status,
 };
 
