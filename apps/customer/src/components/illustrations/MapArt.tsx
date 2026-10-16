@@ -8,9 +8,10 @@ const ROUTE = 'M110 205 C122 150 172 162 205 126 S256 72 300 62';
 /**
  * Stylised city map for the ink headers: streets, blocks, a soft lime glow and
  * a route between a pickup dot and a destination pin. Decorative; fills its
- * parent. `quiet` fades the route so headline text over it stays crisp.
+ * parent. `quiet` fades the route so headline text over it stays crisp;
+ * `showRoute={false}` leaves just the streets, as a backdrop for a real route.
  */
-export function MapArt({ quiet = false }: { quiet?: boolean }) {
+export function MapArt({ quiet = false, showRoute = true }: { quiet?: boolean; showRoute?: boolean }) {
   const route = quiet ? 0.32 : 1;
 
   return (
@@ -49,6 +50,7 @@ export function MapArt({ quiet = false }: { quiet?: boolean }) {
         <Rect x={302} y={248} width={46} height={40} rx={6} />
       </G>
 
+      {showRoute ? (
       <G opacity={route}>
         <Path d={ROUTE} stroke={palette.lime} strokeOpacity={0.22} strokeWidth={12} strokeLinecap="round" fill="none" />
         <Path d={ROUTE} stroke={palette.lime} strokeWidth={4} strokeLinecap="round" fill="none" />
@@ -58,6 +60,7 @@ export function MapArt({ quiet = false }: { quiet?: boolean }) {
         <Circle cx={300} cy={62} r={9.5} fill={palette.white} />
         <Rect x={296.5} y={58.5} width={7} height={7} rx={1.5} fill={palette.ink900} />
       </G>
+      ) : null}
     </Svg>
   );
 }

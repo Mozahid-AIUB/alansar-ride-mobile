@@ -9,8 +9,10 @@ import { lightTheme } from '@alansar/theme';
 import { Button } from '@/components/Button';
 import { VehicleArt } from '@/components/illustrations/VehicleArt';
 import { Notice } from '@/components/Notice';
+import { PressableScale } from '@/components/PressableScale';
 import { useRideHistory } from '@/hooks/queries';
 import { RideRow } from '@/features/rides/RideRow';
+import { startBooking } from '@/store/booking';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
@@ -38,7 +40,15 @@ export function ActivityScreen() {
         <FlatList
           data={rides}
           keyExtractor={(ride) => ride.id}
-          renderItem={({ item }) => <RideRow ride={item} />}
+          renderItem={({ item }) => (
+            <PressableScale
+              accessibilityRole="button"
+              haptic={false}
+              onPress={() => router.push({ pathname: '/trip/[id]', params: { id: item.id } })}
+            >
+              <RideRow ride={item} />
+            </PressableScale>
+          )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           contentContainerStyle={rides.length ? styles.list : styles.listEmpty}
           refreshControl={
@@ -61,7 +71,7 @@ export function ActivityScreen() {
                   When you take a trip, its route, fare and receipt live here.
                 </Text>
                 <View style={styles.emptyAction}>
-                  <Button label="Book a ride" onPress={() => router.navigate('/home')} />
+                  <Button label="Book a ride" onPress={() => startBooking()} />
                 </View>
               </View>
             )

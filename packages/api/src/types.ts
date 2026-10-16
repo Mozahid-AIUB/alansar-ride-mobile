@@ -68,6 +68,103 @@ export type Ride = {
   driver_name: string | null;
 };
 
+/** A ride with everything the trip screen reads (ride.service.js WITH_PARTIES). */
+export type RideDetail = Ride & {
+  pickup_location_id: string | null;
+  dropoff_location_id: string | null;
+  pickup_lat: Numeric;
+  pickup_lng: Numeric;
+  dropoff_lat: Numeric;
+  dropoff_lng: Numeric;
+  duration_minutes: Numeric;
+  fare_agreed_at: string | null;
+  scheduled_for: string | null;
+  dispatched_at: string | null;
+  notes: string | null;
+  cancellation_reason: string | null;
+  cancelled_by: string | null;
+  accepted_at: string | null;
+  arrived_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  driver_id: string | null;
+  driver_phone: string | null;
+  driver_avatar: string | null;
+  driver_rating: Numeric;
+  vehicle_number: string | null;
+  vehicle_details: string | null;
+  vehicle_photo_url: string | null;
+  vehicle_seats: number | null;
+  driver_lat: Numeric;
+  driver_lng: Numeric;
+};
+
+/** A driver's counter-offer on a ride (offer.service.js OFFER_COLUMNS). */
+export type FareOffer = {
+  id: string;
+  ride_id: string;
+  driver_id: string;
+  amount: Numeric;
+  note: string | null;
+  status: string;
+  created_at: string;
+  driver_name: string | null;
+  driver_avatar: string | null;
+  driver_rating: Numeric;
+  driver_total_rides: number | null;
+  vehicle_number: string | null;
+  vehicle_type_name: string | null;
+};
+
+/** A catalogue location (location.service.js PUBLIC_COLUMNS). */
+export type CatalogueLocation = {
+  id: string;
+  name: string;
+  address: string | null;
+  city: string | null;
+  area: string | null;
+  latitude: Numeric;
+  longitude: Numeric;
+};
+
+/** A free-text geocoding hit (geocoding.service.js forwardGeocode). */
+export type GeoResult = {
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+};
+
+/** GET /api/rides/route */
+export type RouteResult = {
+  polyline: { lat: number; lng: number }[];
+  distanceMeters: number;
+  durationSeconds: number;
+  hasTraffic: boolean;
+};
+
+/** POST /api/rides/estimate (ride.service.js estimate()). */
+export type FareEstimate = {
+  distanceKm: number | null;
+  durationMinutes: number | null;
+  estimatedFare: Numeric;
+  fareSource: 'fixed' | 'distance' | 'minimum' | string;
+  fareNote: string | null;
+  isFixedFare: boolean;
+  /** Whether the passenger may name their own price for this trip. */
+  negotiable: boolean;
+  vehicleTypeId: string | null;
+};
+
+/**
+ * One end of a trip, as POST /api/rides/estimate and /request take it: a
+ * catalogue location by id, or a raw coordinate with a label.
+ */
+export type TripEndpoint =
+  | { locationId: string }
+  | { latitude: number; longitude: number; label: string };
+
 export type Pagination = { page: number; limit: number; total: number; pages: number };
 
 /** A row of the API's `notifications` table, as GET /api/notifications returns it. */

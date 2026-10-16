@@ -10,7 +10,9 @@ const { colors, spacing, typography, controls, shadows } = lightTheme;
 type Props = {
   label: string;
   onPress?: () => void;
-  variant?: 'primary' | 'outline';
+  variant?: 'primary' | 'outline' | 'danger';
+  /** `sm` is a compact 40px button for inline actions, e.g. in a list row. */
+  size?: 'md' | 'sm';
   disabled?: boolean;
   loading?: boolean;
   leading?: ReactNode;
@@ -22,12 +24,15 @@ export function Button({
   label,
   onPress,
   variant = 'primary',
+  size = 'md',
   disabled = false,
   loading = false,
   leading,
   trailing,
 }: Props) {
   const primary = variant === 'primary';
+  const danger = variant === 'danger';
+  const small = size === 'sm';
   const inactive = disabled || loading;
 
   return (
@@ -39,16 +44,23 @@ export function Button({
       onPress={onPress}
       style={[
         styles.base,
-        primary ? styles.primary : styles.outline,
+        small && styles.small,
+        primary ? styles.primary : danger ? styles.danger : styles.outline,
         primary && inactive && styles.primaryInactive,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={primary ? colors.onPrimary : colors.text} />
+        <ActivityIndicator color={primary || danger ? colors.onPrimary : colors.text} />
       ) : (
         <>
           {leading}
-          <Text style={[styles.label, primary ? styles.labelPrimary : styles.labelOutline]}>
+          <Text
+            style={[
+              styles.label,
+              small && styles.labelSmall,
+              primary || danger ? styles.labelPrimary : styles.labelOutline,
+            ]}
+          >
             {label}
           </Text>
           {trailing}
@@ -72,6 +84,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     boxShadow: shadows.card,
   },
+  small: {
+    height: 40,
+    borderRadius: 10,
+    paddingHorizontal: spacing.md,
+  },
+  danger: {
+    backgroundColor: colors.danger,
+  },
   primaryInactive: {
     backgroundColor: colors.disabled,
     boxShadow: 'none',
@@ -83,6 +103,9 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.button,
+  },
+  labelSmall: {
+    ...typography.titleSmall,
   },
   labelPrimary: {
     color: colors.onPrimary,

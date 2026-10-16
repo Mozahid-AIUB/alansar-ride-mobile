@@ -1,10 +1,14 @@
 import type { ComponentType } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   CalendarCheck,
   CaretRight,
+  CheckCircle,
+  GlobeHemisphereEast,
+  MapTrifold,
   EnvelopeSimple,
   FileText,
   Lifebuoy,
@@ -23,6 +27,7 @@ import { MapArt } from '@/components/illustrations/MapArt';
 import { PressableScale } from '@/components/PressableScale';
 import { Toast, useToast } from '@/components/Toast';
 import { useSession } from '@/hooks/useSession';
+import { mapPrefs, useMapProvider, type MapProvider } from '@/store/mapPrefs';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
@@ -66,8 +71,13 @@ export function AccountScreen() {
             <InfoRow icon={ShieldCheck} label="Account" value={user.status === 'active' ? 'Active' : user.status} />
           </Group>
 
+          <Group title="Map">
+            <MapOption value="google" icon={MapTrifold} label="Google Maps" body="Default. Apple Maps on iPhone." />
+            <MapOption value="free" icon={GlobeHemisphereEast} label="Free map" body="OpenStreetMap, no Google services." />
+          </Group>
+
           <Group title="More">
-            <ActionRow icon={CalendarCheck} label="Scheduled rides" onPress={() => toast.show('Scheduled rides are coming soon.')} />
+            <ActionRow icon={CalendarCheck} label="Scheduled rides" onPress={() => router.navigate('/activity')} />
             <ActionRow icon={Lifebuoy} label="Help & support" onPress={() => toast.show('Support chat is coming soon.')} />
             <ActionRow icon={FileText} label="Terms & privacy" onPress={() => toast.show('Terms and privacy pages are coming soon.')} />
           </Group>
@@ -90,6 +100,41 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
       <Text style={styles.groupTitle}>{title}</Text>
       <View style={styles.group}>{children}</View>
     </View>
+  );
+}
+
+function MapOption({
+  value,
+  icon: Icon,
+  label,
+  body,
+}: {
+  value: MapProvider;
+  icon: ComponentType<IconProps>;
+  label: string;
+  body: string;
+}) {
+  const selected = useMapProvider() === value;
+  return (
+    <PressableScale
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      style={styles.row}
+      onPress={() => mapPrefs.set(value)}
+    >
+      <View style={styles.rowIcon}>
+        <Icon size={20} color={colors.text} weight="duotone" />
+      </View>
+      <View style={styles.rowText}>
+        <Text style={styles.actionLabel}>{label}</Text>
+        <Text style={styles.rowLabel}>{body}</Text>
+      </View>
+      {selected ? (
+        <CheckCircle size={22} color={colors.brand} weight="fill" />
+      ) : (
+        <View style={styles.radio} />
+      )}
+    </PressableScale>
   );
 }
 
@@ -201,6 +246,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: colors.disabled,
   },
   rowIconDanger: {
     backgroundColor: colors.dangerTint,

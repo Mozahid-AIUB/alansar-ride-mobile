@@ -15,22 +15,23 @@ import { MapArt } from '@/components/illustrations/MapArt';
 import { VehicleArt } from '@/components/illustrations/VehicleArt';
 import { Notice } from '@/components/Notice';
 import { PressableScale } from '@/components/PressableScale';
-import { Toast, useToast } from '@/components/Toast';
 import {
   byAvailability,
+  useActiveRide,
   useRideHistory,
   useUnreadCount,
   useVehicleAvailability,
 } from '@/hooks/queries';
 import { useSession } from '@/hooks/useSession';
+import { startBooking } from '@/store/booking';
 import { RideRow } from '@/features/rides/RideRow';
 
+import { ActiveRideBanner } from './ActiveRideBanner';
 import { FareBanner } from './FareBanner';
+import { HomeMapCard } from './HomeMapCard';
 import { Suggestions } from './Suggestions';
 
 const { colors, spacing, radius, typography, shadows, controls } = lightTheme;
-
-const BOOKING_NEXT = 'Booking a ride is the next screen we build.';
 
 const enter = (delay: number) => FadeInDown.delay(delay).duration(460);
 
@@ -44,10 +45,10 @@ const greeting = () => {
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const state = useSession();
-  const toast = useToast();
   const vehicles = useVehicleAvailability();
   const history = useRideHistory(3);
   const unread = useUnreadCount().data ?? 0;
+  const active = useActiveRide().data;
 
   if (state.status !== 'signedIn') return null;
   const name = state.user.full_name?.trim() || 'there';
@@ -106,12 +107,13 @@ export function HomeScreen() {
         </LinearGradient>
 
         <View style={styles.body}>
+          {active ? <ActiveRideBanner ride={active} /> : null}
           <Animated.View entering={enter(100)}>
             <PressableScale
               accessibilityRole="button"
               accessibilityLabel="Where to?"
               style={styles.search}
-              onPress={() => toast.show(BOOKING_NEXT)}
+              onPress={() => startBooking()}
             >
               <View style={styles.searchIcon}>
                 <MagnifyingGlass size={20} color={colors.onPrimary} weight="bold" />
@@ -124,6 +126,10 @@ export function HomeScreen() {
             </PressableScale>
           </Animated.View>
 
+          <Animated.View entering={enter(130)}>
+            <HomeMapCard />
+          </Animated.View>
+
           <Animated.View entering={enter(160)}>
             <SectionTitle
               title="Suggestions"
@@ -134,8 +140,8 @@ export function HomeScreen() {
             ) : (
               <Suggestions
                 vehicles={vehicles.data ? [...vehicles.data].sort(byAvailability) : undefined}
-                onPick={() => toast.show(BOOKING_NEXT)}
-                onSchedule={() => toast.show('Scheduling opens together with booking.')}
+                onPick={(v) => startBooking({ vehicleTypeId: v.id })}
+                onSchedule={() => startBooking({ scheduling: true })}
               />
             )}
           </Animated.View>
@@ -154,9 +160,15 @@ export function HomeScreen() {
                 <Notice tone="error" message={describeError(history.error)} />
               ) : rides.length ? (
                 rides.map((ride, i) => (
-                  <View key={ride.id} style={i > 0 && styles.divider}>
+                  <PressableScale
+                    key={ride.id}
+                    accessibilityRole="button"
+                    haptic={false}
+                    style={i > 0 && styles.divider}
+                    onPress={() => router.push({ pathname: '/trip/[id]', params: { id: ride.id } })}
+                  >
                     <RideRow ride={ride} />
-                  </View>
+                  </PressableScale>
                 ))
               ) : history.isPending ? (
                 <Text style={styles.muted}>Loading your rides…</Text>
@@ -168,7 +180,7 @@ export function HomeScreen() {
                   <Text style={styles.emptyTitle}>Your first ride is a tap away</Text>
                   <Text style={styles.emptyBody}>Trips you take will show up here.</Text>
                   <View style={styles.emptyAction}>
-                    <Button label="Book a ride" onPress={() => toast.show(BOOKING_NEXT)} />
+                    <Button label="Book a ride" onPress={() => startBooking()} />
                   </View>
                 </View>
               )}
@@ -176,8 +188,6 @@ export function HomeScreen() {
           </Animated.View>
         </View>
       </ScrollView>
-
-      <Toast toast={toast.toast} />
     </View>
   );
 }

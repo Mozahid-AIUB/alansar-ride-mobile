@@ -9,14 +9,13 @@ import { lightTheme } from '@alansar/theme';
 
 import { Notice } from '@/components/Notice';
 import { PressableScale } from '@/components/PressableScale';
-import { Toast, useToast } from '@/components/Toast';
 import { byAvailability, useVehicleAvailability } from '@/hooks/queries';
+import { startBooking } from '@/store/booking';
 
 import { VehicleCard, VehicleCardSkeleton } from '../home/VehicleCard';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
-const BOOKING_NEXT = 'Booking a ride is the next screen we build.';
 const GAP = spacing.sm + 4;
 
 const enter = (delay: number) => FadeInDown.delay(delay).duration(420);
@@ -25,7 +24,6 @@ const enter = (delay: number) => FadeInDown.delay(delay).duration(420);
 export function ServicesScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const toast = useToast();
   const vehicles = useVehicleAvailability();
 
   const tileWidth = (width - spacing.lg * 2 - GAP) / 2;
@@ -54,7 +52,7 @@ export function ServicesScreen() {
                       vehicle={v}
                       style={{ width: tileWidth }}
                       artWidth={Math.min(120, tileWidth - 40)}
-                      onPress={() => toast.show(BOOKING_NEXT)}
+                      onPress={() => startBooking({ vehicleTypeId: v.id })}
                     />
                   ))
                 : [0, 1, 2, 3].map((i) => (
@@ -69,7 +67,7 @@ export function ServicesScreen() {
           <PressableScale
             accessibilityRole="button"
             style={styles.schedule}
-            onPress={() => toast.show('Scheduling opens together with booking.')}
+            onPress={() => startBooking({ scheduling: true })}
           >
             <View style={styles.scheduleIcon}>
               <CalendarBlank size={26} color={colors.brand} weight="duotone" />
@@ -84,7 +82,6 @@ export function ServicesScreen() {
           </PressableScale>
         </Animated.View>
       </ScrollView>
-      <Toast toast={toast.toast} />
     </View>
   );
 }

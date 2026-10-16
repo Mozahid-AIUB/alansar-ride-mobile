@@ -16,6 +16,7 @@ import { restoreSession } from '@alansar/auth';
 import { useSession } from '@/hooks/useSession';
 import { setUpApi } from '@/services/api';
 import { secureStorage } from '@/services/storage';
+import { mapPrefs } from '@/store/mapPrefs';
 
 setUpApi();
 
@@ -35,6 +36,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void restoreSession(secureStorage);
+    void mapPrefs.restore();
   }, []);
 
   // Another account must never see the last one's cached rides.
@@ -54,6 +56,9 @@ export default function RootLayout() {
           <Stack.Protected guard={signedIn}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="notifications" />
+            <Stack.Screen name="booking/search" />
+            <Stack.Screen name="booking/review" />
+            <Stack.Screen name="trip/[id]" />
           </Stack.Protected>
           <Stack.Protected guard={!signedIn}>
             <Stack.Screen name="index" />
