@@ -53,6 +53,7 @@ export default function RootLayout() {
           {/* Flipping these guards on sign-in / sign-out redirects automatically. */}
           <Stack.Protected guard={signedIn}>
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="notifications" />
           </Stack.Protected>
           <Stack.Protected guard={!signedIn}>
             <Stack.Screen name="index" />

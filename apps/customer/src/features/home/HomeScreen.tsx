@@ -1,17 +1,8 @@
-import type { ComponentType } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import {
-  Bell,
-  CalendarBlank,
-  Clock,
-  ClockCounterClockwise,
-  Lifebuoy,
-  MagnifyingGlass,
-  type IconProps,
-} from 'phosphor-react-native';
+import { Bell, Clock, MagnifyingGlass } from 'phosphor-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,12 +16,17 @@ import { VehicleArt } from '@/components/illustrations/VehicleArt';
 import { Notice } from '@/components/Notice';
 import { PressableScale } from '@/components/PressableScale';
 import { Toast, useToast } from '@/components/Toast';
-import { useRideHistory, useVehicleAvailability } from '@/hooks/queries';
+import {
+  byAvailability,
+  useRideHistory,
+  useUnreadCount,
+  useVehicleAvailability,
+} from '@/hooks/queries';
 import { useSession } from '@/hooks/useSession';
 import { RideRow } from '@/features/rides/RideRow';
 
 import { FareBanner } from './FareBanner';
-import { VehicleCard, VehicleCardSkeleton } from './VehicleCard';
+import { Suggestions } from './Suggestions';
 
 const { colors, spacing, radius, typography, shadows, controls } = lightTheme;
 
@@ -51,6 +47,7 @@ export function HomeScreen() {
   const toast = useToast();
   const vehicles = useVehicleAvailability();
   const history = useRideHistory(3);
+  const unread = useUnreadCount().data ?? 0;
 
   if (state.status !== 'signedIn') return null;
   const name = state.user.full_name?.trim() || 'there';
@@ -82,9 +79,14 @@ export function HomeScreen() {
               accessibilityLabel="Notifications"
               hitSlop={8}
               style={styles.glassButton}
-              onPress={() => toast.show('Notifications are coming soon.')}
+              onPress={() => router.push('/notifications')}
             >
               <Bell size={20} color={onHero.text} weight="bold" />
+              {unread ? (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unread > 9 ? '9+' : unread}</Text>
+                </View>
+              ) : null}
             </PressableScale>
           </View>
 
@@ -122,37 +124,19 @@ export function HomeScreen() {
             </PressableScale>
           </Animated.View>
 
-          <Animated.View entering={enter(160)} style={styles.shortcuts}>
-            <Shortcut icon={CalendarBlank} label="Schedule" onPress={() => toast.show(BOOKING_NEXT)} />
-            <Shortcut
-              icon={ClockCounterClockwise}
-              label="Activity"
-              onPress={() => router.navigate('/activity')}
+          <Animated.View entering={enter(160)}>
+            <SectionTitle
+              title="Suggestions"
+              action={{ label: 'See all', onPress: () => router.navigate('/services') }}
             />
-            <Shortcut
-              icon={Lifebuoy}
-              label="Support"
-              onPress={() => toast.show('Support chat is coming soon.')}
-            />
-          </Animated.View>
-
-          <Animated.View entering={enter(220)}>
-            <SectionTitle title="Choose a ride" />
             {vehicles.isError ? (
               <Notice tone="error" message={describeError(vehicles.error)} />
             ) : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.vehicles}
-                style={styles.bleed}
-              >
-                {vehicles.data
-                  ? vehicles.data.map((v) => (
-                      <VehicleCard key={v.id} vehicle={v} onPress={() => toast.show(BOOKING_NEXT)} />
-                    ))
-                  : [0, 1, 2].map((i) => <VehicleCardSkeleton key={i} />)}
-              </ScrollView>
+              <Suggestions
+                vehicles={vehicles.data ? [...vehicles.data].sort(byAvailability) : undefined}
+                onPick={() => toast.show(BOOKING_NEXT)}
+                onSchedule={() => toast.show('Scheduling opens together with booking.')}
+              />
             )}
           </Animated.View>
 
@@ -217,25 +201,6 @@ function SectionTitle({
   );
 }
 
-function Shortcut({
-  icon: Icon,
-  label,
-  onPress,
-}: {
-  icon: ComponentType<IconProps>;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <PressableScale accessibilityRole="button" style={styles.shortcut} onPress={onPress}>
-      <View style={styles.shortcutIcon}>
-        <Icon size={22} color={colors.brand} weight="duotone" />
-      </View>
-      <Text style={styles.shortcutLabel}>{label}</Text>
-    </PressableScale>
-  );
-}
-
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -277,6 +242,26 @@ const styles = StyleSheet.create({
   },
   helloName: {
     ...typography.title,
+    color: onHero.text,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 19,
+    height: 19,
+    paddingHorizontal: 4,
+    borderRadius: radius.pill,
+    borderWidth: 2,
+    borderColor: lightTheme.colors.primary,
+    backgroundColor: lightTheme.colors.danger,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    ...typography.label,
+    fontSize: 10,
+    lineHeight: 12,
     color: onHero.text,
   },
   glassButton: {
@@ -359,33 +344,6 @@ const styles = StyleSheet.create({
     ...typography.titleSmall,
     color: colors.text,
   },
-  shortcuts: {
-    flexDirection: 'row',
-    gap: spacing.sm + 4,
-  },
-  shortcut: {
-    flex: 1,
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.md,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    boxShadow: shadows.card,
-  },
-  shortcutIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.brandTint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shortcutLabel: {
-    ...typography.caption,
-    color: colors.text,
-  },
   sectionRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -399,15 +357,6 @@ const styles = StyleSheet.create({
   sectionAction: {
     ...typography.titleSmall,
     color: colors.brandStrong,
-  },
-  // Let the carousel run to the screen edges while its first card lines up with the page.
-  bleed: {
-    marginHorizontal: -spacing.lg,
-  },
-  vehicles: {
-    gap: spacing.sm + 4,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xs,
   },
   card: {
     paddingHorizontal: spacing.md,

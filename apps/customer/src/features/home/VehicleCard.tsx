@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { User } from 'phosphor-react-native';
 
@@ -13,7 +13,15 @@ const { colors, radius, spacing, typography, shadows } = lightTheme;
 
 export const VEHICLE_CARD_WIDTH = 132;
 
-export function VehicleCard({ vehicle, onPress }: { vehicle: VehicleType; onPress: () => void }) {
+type Props = {
+  vehicle: VehicleType;
+  onPress: () => void;
+  /** Overrides the carousel width, e.g. for a two-column grid. */
+  style?: StyleProp<ViewStyle>;
+  artWidth?: number;
+};
+
+export function VehicleCard({ vehicle, onPress, style, artWidth = 84 }: Props) {
   const image = assetUrl(vehicle.image_url);
   const online = vehicle.online_count > 0;
 
@@ -21,14 +29,14 @@ export function VehicleCard({ vehicle, onPress }: { vehicle: VehicleType; onPres
     <PressableScale
       accessibilityRole="button"
       accessibilityLabel={`${vehicle.name}, ${online ? `${vehicle.online_count} nearby` : 'no drivers online'}`}
-      style={styles.card}
+      style={[styles.card, style]}
       onPress={onPress}
     >
       <View style={styles.art}>
         {image ? (
           <Image source={image} style={styles.image} contentFit="contain" />
         ) : (
-          <VehicleArt slug={vehicle.slug} width={84} />
+          <VehicleArt slug={vehicle.slug} width={artWidth} />
         )}
       </View>
       <Text style={styles.name} numberOfLines={1}>
@@ -50,9 +58,9 @@ export function VehicleCard({ vehicle, onPress }: { vehicle: VehicleType; onPres
   );
 }
 
-export function VehicleCardSkeleton() {
+export function VehicleCardSkeleton({ style }: { style?: StyleProp<ViewStyle> }) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, style]}>
       <Skeleton width="100%" height={64} />
       <Skeleton width="70%" height={14} style={styles.skeletonLine} />
       <Skeleton width="50%" height={12} style={styles.skeletonLine} />

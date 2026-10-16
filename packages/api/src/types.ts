@@ -70,5 +70,17 @@ export type Ride = {
 
 export type Pagination = { page: number; limit: number; total: number; pages: number };
 
+/** A row of the API's `notifications` table, as GET /api/notifications returns it. */
+export type AppNotification = {
+  id: string;
+  title: string;
+  body: string | null;
+  type: string | null;
+  ride_id: string | null;
+  ticket_id: string | null;
+  is_read: boolean;
+  created_at: string;
+};
+
 /** With OTP switched off by the operator, sign-up returns a session straight away. */
 export type Registration = ({ otpRequired: true } & CodeSent) | ({ otpRequired: false } & AuthSession);

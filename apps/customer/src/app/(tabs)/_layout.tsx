@@ -2,7 +2,13 @@ import type { ComponentType } from 'react';
 import { Platform, type ColorValue } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
-import { ClockCounterClockwise, House, UserCircle, type IconProps } from 'phosphor-react-native';
+import {
+  ClockCounterClockwise,
+  House,
+  SquaresFour,
+  UserCircle,
+  type IconProps,
+} from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fonts, lightTheme } from '@alansar/theme';
@@ -27,13 +33,13 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.textSubtle,
-        // Plus Jakarta Sans sits taller than the system font, so the bar sets
-        // its own height and line height rather than clipping the labels.
+        // Each tab needs ~54px for icon, label and its own padding; the default
+        // bar leaves 49, which squeezes Plus Jakarta Sans labels and clips them.
         tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11, lineHeight: 16 },
         tabBarStyle: {
-          height: 62 + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: insets.bottom + 6,
+          height: 66 + insets.bottom,
+          paddingTop: 4,
+          paddingBottom: insets.bottom + 4,
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
         },
@@ -45,6 +51,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: icon(House) }} />
+      <Tabs.Screen name="services" options={{ title: 'Services', tabBarIcon: icon(SquaresFour) }} />
       <Tabs.Screen
         name="activity"
         options={{ title: 'Activity', tabBarIcon: icon(ClockCounterClockwise) }}
