@@ -27,6 +27,7 @@ import { MapArt } from '@/components/illustrations/MapArt';
 import { PressableScale } from '@/components/PressableScale';
 import { Toast, useToast } from '@/components/Toast';
 import { useSession } from '@/hooks/useSession';
+import { hasMapboxToken } from '@/components/map/mapConfig';
 import { mapPrefs, useMapProvider, type MapProvider } from '@/store/mapPrefs';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
@@ -73,7 +74,12 @@ export function AccountScreen() {
 
           <Group title="Map">
             <MapOption value="google" icon={MapTrifold} label="Google Maps" body="Default. Apple Maps on iPhone." />
-            <MapOption value="free" icon={GlobeHemisphereEast} label="Free map" body="OpenStreetMap, no Google services." />
+            <MapOption
+              value="mapbox"
+              icon={GlobeHemisphereEast}
+              label="Mapbox"
+              body={hasMapboxToken ? 'Clean, detailed maps by Mapbox.' : 'Needs a Mapbox token; showing OpenStreetMap for now.'}
+            />
           </Group>
 
           <Group title="More">

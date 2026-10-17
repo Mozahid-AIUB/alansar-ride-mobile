@@ -7,7 +7,7 @@ import { palette } from '@alansar/theme';
 
 import type { Coord } from '@/store/booking';
 
-import { DEFAULT_CENTER, FREE_TILES } from './mapConfig';
+import { DEFAULT_CENTER, OPEN_TILES } from './mapConfig';
 import type { RouteMapProps } from './RouteMap';
 
 /** Brand pins as Leaflet div icons (plain HTML, so no marker images to bundle). */
@@ -36,9 +36,9 @@ const DRIVER = pin(
 const toLatLng = (c: Coord): L.LatLngTuple => [c.latitude, c.longitude];
 
 /**
- * Browser map: Leaflet with the free OpenStreetMap tiles. react-native-maps has
- * no web build, and Google's web map needs a paid key, so the web preview
- * always shows the free provider — the same route, pins and driver as the phone.
+ * Browser map: Leaflet with Mapbox tiles (OpenStreetMap until a token is set).
+ * react-native-maps has no web build, and Google's web map needs a paid key, so
+ * the browser always shows these tiles — the same route, pins and driver as the phone.
  */
 export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, interactive = true }: RouteMapProps) {
   const host = useRef<View>(null);
@@ -59,11 +59,11 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
       boxZoom: interactive,
       keyboard: interactive,
     }).setView(toLatLng(DEFAULT_CENTER), 12);
-    L.tileLayer(FREE_TILES.web, {
-      maxZoom: FREE_TILES.maxZoom,
-      attribution: FREE_TILES.attribution,
-      tileSize: FREE_TILES.tileSize,
-      zoomOffset: FREE_TILES.tileSize === 512 ? -1 : 0,
+    L.tileLayer(OPEN_TILES.url, {
+      maxZoom: OPEN_TILES.maxZoom,
+      attribution: OPEN_TILES.attribution,
+      tileSize: OPEN_TILES.tileSize,
+      zoomOffset: OPEN_TILES.tileSize === 512 ? -1 : 0,
     }).addTo(m);
     m.attributionControl.setPrefix(false);
     layer.current = L.layerGroup().addTo(m);

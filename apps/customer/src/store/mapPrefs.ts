@@ -4,10 +4,10 @@ import { secureStorage } from '@/services/storage';
 
 /**
  * Which map the passenger sees. `google`: Google Maps on Android (Apple Maps on
- * iOS, the platform default). `free`: OpenStreetMap tiles, no Google at all.
- * The browser preview always uses the free map; Google's web map needs a paid key.
+ * iOS, the platform default). `mapbox`: Mapbox tiles, no Google at all.
+ * The browser preview always draws Mapbox tiles; Google's web map needs a paid key.
  */
-export type MapProvider = 'google' | 'free';
+export type MapProvider = 'google' | 'mapbox';
 
 const KEY = 'alansar.mapProvider';
 
@@ -30,8 +30,10 @@ export const mapPrefs = {
   /** Read the saved choice once at start-up. */
   restore: async () => {
     const saved = await secureStorage.get(KEY);
-    if (saved === 'google' || saved === 'free') {
-      provider = saved;
+    // 'free' was the OpenStreetMap option before Mapbox replaced it.
+    const value = saved === 'free' ? 'mapbox' : saved;
+    if (value === 'google' || value === 'mapbox') {
+      provider = value;
       listeners.forEach((listener) => listener());
     }
   },

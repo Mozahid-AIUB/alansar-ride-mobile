@@ -7,7 +7,7 @@ import { lightTheme, palette } from '@alansar/theme';
 import type { Coord } from '@/store/booking';
 import { useMapProvider } from '@/store/mapPrefs';
 
-import { DEFAULT_CENTER, FREE_TILES } from './mapConfig';
+import { DEFAULT_CENTER, OPEN_TILES } from './mapConfig';
 import { CLEAN_MAP_STYLE } from './mapStyle';
 import { DriverPin, DropoffPin, PickupPin } from './Pins';
 
@@ -31,11 +31,11 @@ const INITIAL_REGION = { ...DEFAULT_CENTER, latitudeDelta: 0.12, longitudeDelta:
 
 /**
  * The phone map (react-native-maps). Google Maps on Android, Apple Maps on iOS,
- * or — with the free provider — OpenStreetMap tiles replacing the base map.
+ * or — with the Mapbox provider — Mapbox tiles replacing the base map.
  */
 export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, interactive = true }: RouteMapProps) {
   const provider = useMapProvider();
-  const free = provider === 'free';
+  const free = provider === 'mapbox';
   const map = useRef<MapView>(null);
   const line = route?.length ? route : pickup && dropoff ? [pickup, dropoff] : null;
 
@@ -66,7 +66,7 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
         ref={map}
         style={StyleSheet.absoluteFill}
         provider={Platform.OS === 'android' && !free ? PROVIDER_GOOGLE : undefined}
-        // On Android "none" hides Google's base map so only the free tiles draw.
+        // On Android "none" hides Google's base map so only the Mapbox tiles draw.
         mapType={free && Platform.OS === 'android' ? 'none' : 'standard'}
         customMapStyle={free ? undefined : CLEAN_MAP_STYLE}
         initialRegion={INITIAL_REGION}
@@ -82,9 +82,9 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
       >
         {free ? (
           <UrlTile
-            urlTemplate={FREE_TILES.native}
-            maximumZ={FREE_TILES.maxZoom}
-            tileSize={FREE_TILES.tileSize}
+            urlTemplate={OPEN_TILES.url}
+            maximumZ={OPEN_TILES.maxZoom}
+            tileSize={OPEN_TILES.tileSize}
             shouldReplaceMapContent
           />
         ) : null}
@@ -113,7 +113,7 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
         ) : null}
       </MapView>
       {free ? (
-        <Text style={[styles.attribution, { bottom: bottomInset + spacing.xs }]}>{FREE_TILES.attribution}</Text>
+        <Text style={[styles.attribution, { bottom: bottomInset + spacing.xs }]}>{OPEN_TILES.attribution}</Text>
       ) : null}
     </View>
   );
