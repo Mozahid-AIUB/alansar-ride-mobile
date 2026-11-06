@@ -7,6 +7,7 @@ import { CalendarBlank, Clock, HandCoins } from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError, ridesApi } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { fonts, lightTheme } from '@alansar/theme';
 import { formatTaka } from '@alansar/utils';
 
@@ -33,6 +34,7 @@ const { colors, spacing, radius, typography, controls, shadows } = lightTheme;
 export function ReviewScreen() {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  const t = useT();
   const { pickup, dropoff, vehicleTypeId, scheduling } = useBooking();
 
   const vehicles = useVehicleAvailability();
@@ -86,8 +88,8 @@ export function ReviewScreen() {
 
   const mapHeight = Math.round(height * 0.34);
   const label = vehicle
-    ? `${later ? 'Schedule' : 'Request'} ${vehicle.name}${fare ? ` · ${formatTaka(fare)}` : ''}`
-    : 'Choose a ride';
+    ? `${later ? t('review.scheduleVehicle', { vehicle: vehicle.name }) : t('review.requestVehicle', { vehicle: vehicle.name })}${fare ? ` · ${formatTaka(fare)}` : ''}`
+    : t('review.chooseRide');
 
   return (
     <View style={styles.root}>
@@ -120,17 +122,17 @@ export function ReviewScreen() {
                 {dropoff.name}
               </Text>
             </View>
-            <Text style={styles.edit}>Edit</Text>
+            <Text style={styles.edit}>{t('review.edit')}</Text>
           </PressableScale>
           {km || minutes ? (
             <Text style={styles.tripMeta}>
-              {[km ? `${km.toFixed(1)} km` : null, minutes ? `about ${minutes} min` : null]
+              {[km ? t('review.km', { km: km.toFixed(1) }) : null, minutes ? t('review.aboutMin', { min: minutes }) : null]
                 .filter(Boolean)
                 .join(' · ')}
             </Text>
           ) : null}
 
-          <Text style={styles.section}>Choose a ride</Text>
+          <Text style={styles.section}>{t('review.chooseRide')}</Text>
           {vehicles.isError ? <Notice tone="error" message={describeError(vehicles.error)} /> : null}
           {quoteError ? <Notice tone="error" message={describeError(quoteError)} /> : null}
           <View style={styles.options}>
@@ -153,17 +155,17 @@ export function ReviewScreen() {
                   <HandCoins size={22} color={colors.brand} weight="duotone" />
                 </View>
                 <View style={styles.cardText}>
-                  <Text style={styles.cardTitle}>Your fare</Text>
-                  <Text style={styles.cardBody}>Offer your own price. Drivers accept or counter.</Text>
+                  <Text style={styles.cardTitle}>{t('review.yourFare')}</Text>
+                  <Text style={styles.cardBody}>{t('review.offerPrice')}</Text>
                 </View>
               </View>
               <View style={styles.segment}>
                 <Segment
-                  label={`Suggested ${formatTaka(estimate.estimatedFare)}`}
+                  label={t('review.suggested', { fare: formatTaka(estimate.estimatedFare) })}
                   selected={fareMode === 'suggested'}
                   onPress={() => setFareMode('suggested')}
                 />
-                <Segment label="My own fare" selected={fareMode === 'own'} onPress={() => setFareMode('own')} />
+                <Segment label={t('review.myOwnFare')} selected={fareMode === 'own'} onPress={() => setFareMode('own')} />
               </View>
               {fareMode === 'own' ? (
                 <View style={styles.fareInput}>
@@ -175,20 +177,20 @@ export function ReviewScreen() {
                     placeholderTextColor={colors.placeholder}
                     keyboardType="number-pad"
                     autoFocus
-                    accessibilityLabel="Your fare in taka"
+                    accessibilityLabel={t('review.yourFareInput')}
                     style={styles.fareText}
                   />
                 </View>
               ) : null}
             </View>
           ) : estimate?.isFixedFare ? (
-            <Text style={styles.note}>Fixed fare for this route, set by Al Ansar.</Text>
+            <Text style={styles.note}>{t('review.fixedFare')}</Text>
           ) : null}
 
-          <Text style={styles.section}>When</Text>
+          <Text style={styles.section}>{t('review.when')}</Text>
           <View style={styles.segment}>
-            <Segment icon="now" label="Now" selected={!later} onPress={() => setLater(false)} />
-            <Segment icon="later" label="Schedule" selected={later} onPress={() => setLater(true)} />
+            <Segment icon="now" label={t('review.now')} selected={!later} onPress={() => setLater(false)} />
+            <Segment icon="later" label={t('review.schedule')} selected={later} onPress={() => setLater(true)} />
           </View>
           {later ? (
             <View style={styles.picker}>
@@ -198,7 +200,7 @@ export function ReviewScreen() {
 
           {vehicle && vehicle.online_count === 0 && !later ? (
             <View style={styles.notice}>
-              <Notice message={`No ${vehicle.name} drivers are online right now. You can still request and we'll keep looking.`} />
+              <Notice message={t('review.noDriversNow', { vehicle: vehicle.name })} />
             </View>
           ) : null}
           {request.isError ? (

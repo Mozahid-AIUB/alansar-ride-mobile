@@ -84,6 +84,24 @@ export const en = {
   'search.continueTo': 'Continue to {name}',
   'search.seeFares': 'See rides and fares',
 
+  // Review
+  'review.edit': 'Edit',
+  'review.km': '{km} km',
+  'review.aboutMin': 'about {min} min',
+  'review.chooseRide': 'Choose a ride',
+  'review.yourFare': 'Your fare',
+  'review.offerPrice': 'Offer your own price. Drivers accept or counter.',
+  'review.suggested': 'Suggested {fare}',
+  'review.myOwnFare': 'My own fare',
+  'review.yourFareInput': 'Your fare in taka',
+  'review.fixedFare': 'Fixed fare for this route, set by Al Ansar.',
+  'review.when': 'When',
+  'review.now': 'Now',
+  'review.schedule': 'Schedule',
+  'review.noDriversNow': "No {vehicle} drivers are online right now. You can still request and we'll keep looking.",
+  'review.requestVehicle': 'Request {vehicle}',
+  'review.scheduleVehicle': 'Schedule {vehicle}',
+
   // Pick on map
   'pick.setDestination': 'Set your destination',
   'pick.setPickup': 'Set your pickup',
@@ -227,6 +245,24 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'search.popularError': 'জনপ্রিয় স্থান লোড করা যায়নি।',
   'search.continueTo': '{name} এ এগিয়ে যান',
   'search.seeFares': 'যাত্রা ও ভাড়া দেখুন',
+
+  // Review
+  'review.edit': 'সম্পাদনা',
+  'review.km': '{km} কিমি',
+  'review.aboutMin': 'প্রায় {min} মিনিট',
+  'review.chooseRide': 'যাত্রা বেছে নিন',
+  'review.yourFare': 'আপনার ভাড়া',
+  'review.offerPrice': 'নিজের দাম প্রস্তাব করুন। চালক মানবে বা পাল্টা দাম দেবে।',
+  'review.suggested': 'প্রস্তাবিত {fare}',
+  'review.myOwnFare': 'আমার নিজের ভাড়া',
+  'review.yourFareInput': 'টাকায় আপনার ভাড়া',
+  'review.fixedFare': 'এই রুটের নির্ধারিত ভাড়া, আল আনসার কর্তৃক।',
+  'review.when': 'কখন',
+  'review.now': 'এখন',
+  'review.schedule': 'নির্ধারণ',
+  'review.noDriversNow': 'এই মুহূর্তে কোনো {vehicle} চালক অনলাইনে নেই। তবুও অনুরোধ করতে পারেন, আমরা খুঁজতে থাকব।',
+  'review.requestVehicle': '{vehicle} অনুরোধ করুন',
+  'review.scheduleVehicle': '{vehicle} নির্ধারণ করুন',
 
   // Pick on map
   'pick.setDestination': 'আপনার গন্তব্য ঠিক করুন',
