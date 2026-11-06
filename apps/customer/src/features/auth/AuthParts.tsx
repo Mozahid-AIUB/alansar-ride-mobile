@@ -2,15 +2,13 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 
+import { useT } from '@alansar/i18n';
 import { fonts, lightTheme, onHero } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
 import { GoogleLogo } from '@/components/GoogleLogo';
 
 const { colors, spacing, typography } = lightTheme;
-
-export const INVALID_PHONE = 'Enter a valid Bangladeshi mobile number';
-export const INVALID_EMAIL = 'Enter a valid email address';
 
 /** Back to Log in without stacking a second copy of it. */
 export const backToLogin = () => (router.canGoBack() ? router.back() : router.replace('/login'));
@@ -57,12 +55,29 @@ export function TextLink({ label, onPress }: { label: string; onPress: () => voi
   );
 }
 
-/** `short` says "Terms" instead of "Terms of Service", to keep a checkbox label on one line. */
+/** The two legal links, "<Terms> and <Privacy Policy>", emphasised inline. */
 export function LegalLinks({ short = false }: { short?: boolean }) {
+  const t = useT();
   return (
     <>
-      <Text style={styles.inlineLink}>{short ? 'Terms' : 'Terms of Service'}</Text> and{' '}
-      <Text style={styles.inlineLink}>Privacy Policy</Text>
+      <Text style={styles.inlineLink}>{short ? t('auth.termsShort') : t('legal.terms.title')}</Text>
+      {t('auth.and')}
+      <Text style={styles.inlineLink}>{t('legal.privacyWord')}</Text>
+    </>
+  );
+}
+
+/** The full "By continuing, you agree to our <Terms> and <Privacy Policy>." line. */
+export function LegalTerms() {
+  const t = useT();
+  const parts = t('legal.termsAnd').split(/\{terms\}|\{privacy\}/);
+  return (
+    <>
+      {parts[0]}
+      <Text style={styles.inlineLink}>{t('legal.terms.title')}</Text>
+      {parts[1]}
+      <Text style={styles.inlineLink}>{t('legal.privacyWord')}</Text>
+      {parts[2]}
     </>
   );
 }
@@ -74,6 +89,7 @@ export function HeroStrong({ children }: { children: ReactNode }) {
 
 /** "Resend code in 0:27", then a Resend link once the cooldown ends. */
 export function ResendCode({ seconds = 30, onResend }: { seconds?: number; onResend?: () => void }) {
+  const t = useT();
   const [left, setLeft] = useState(seconds);
 
   useEffect(() => {
@@ -83,11 +99,11 @@ export function ResendCode({ seconds = 30, onResend }: { seconds?: number; onRes
   }, [left]);
 
   if (left > 0) {
-    return <Text style={styles.muted}>Resend code in 0:{String(left).padStart(2, '0')}</Text>;
+    return <Text style={styles.muted}>{t('auth.resendIn', { time: `0:${String(left).padStart(2, '0')}` })}</Text>;
   }
   return (
     <TextLink
-      label="Resend code"
+      label={t('auth.resendCode')}
       onPress={() => {
         setLeft(seconds);
         onResend?.();

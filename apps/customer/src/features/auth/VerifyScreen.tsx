@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { authApi, describeError } from '@alansar/api';
 import { signIn } from '@alansar/auth';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
@@ -21,13 +22,12 @@ type Message = { tone: 'error' | 'success'; text: string } | null;
 
 /** Sign-up step 2: the emailed code. The account is created only when this succeeds. */
 export function VerifyScreen() {
+  const t = useT();
   const { email = '', sent } = useLocalSearchParams<{ email?: string; sent?: string }>();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message>(
-    sent === '0'
-      ? { tone: 'error', text: "We couldn't send the email. Check the address, or tap Resend code." }
-      : null,
+    sent === '0' ? { tone: 'error', text: t('verify.sendFailed') } : null,
   );
 
   const onVerify = async () => {
@@ -50,8 +50,8 @@ export function VerifyScreen() {
       const result = await authApi.resendRegistrationCode(email);
       setMessage(
         result.sent
-          ? { tone: 'success', text: `A new code is on its way to ${email}.` }
-          : { tone: 'error', text: "We couldn't send the email. Please try again in a minute." },
+          ? { tone: 'success', text: t('verify.newCodeSent', { email }) }
+          : { tone: 'error', text: t('verify.sendFailedRetry') },
       );
     } catch (err) {
       setMessage({ tone: 'error', text: describeError(err) });
@@ -60,10 +60,10 @@ export function VerifyScreen() {
 
   return (
     <AuthLayout
-      title="Verify your email"
+      title={t('verify.title')}
       subtitle={
         <>
-          Enter the 6-digit code sent to <HeroStrong>{email}</HeroStrong>
+          {t('verify.codeSentTo')}<HeroStrong>{email}</HeroStrong>
         </>
       }
     >
@@ -71,7 +71,7 @@ export function VerifyScreen() {
 
       <View style={styles.row}>
         <ResendCode seconds={60} onResend={() => void onResend()} />
-        <TextLink label="Change email" onPress={() => router.back()} />
+        <TextLink label={t('verify.changeEmail')} onPress={() => router.back()} />
       </View>
 
       {message ? <Notice tone={message.tone} message={message.text} /> : null}
@@ -79,7 +79,7 @@ export function VerifyScreen() {
       <View style={styles.spacer} />
 
       <Button
-        label="Verify and create account"
+        label={t('verify.submit')}
         disabled={code.length < CODE_LENGTH}
         loading={busy}
         onPress={() => void onVerify()}

@@ -5,6 +5,7 @@ import { ArrowRight, User } from 'phosphor-react-native';
 
 import { authApi, describeError } from '@alansar/api';
 import { googleReady, signIn } from '@alansar/auth';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { isValidLoginId } from '@alansar/utils';
 
@@ -14,13 +15,12 @@ import { PasswordField } from '@/components/PasswordField';
 import { TextField } from '@/components/TextField';
 
 import { AuthLayout } from './AuthLayout';
-import { GoogleButton, LegalLinks, OrDivider, SwitchPrompt, TextLink } from './AuthParts';
+import { GoogleButton, LegalTerms, OrDivider, SwitchPrompt, TextLink } from './AuthParts';
 
 const { colors, spacing, typography } = lightTheme;
 
-const DRIVER_ACCOUNT = 'This is a driver account. Please log in with the Al Ansar Driver app.';
-
 export function LoginScreen() {
+  const t = useT();
   const { notice } = useLocalSearchParams<{ notice?: string }>();
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +37,7 @@ export function LoginScreen() {
     try {
       const result = await authApi.login(loginId.trim(), password);
       if (result.user.user_type !== 'customer') {
-        setError(DRIVER_ACCOUNT);
+        setError(t('auth.driverAccount'));
         return;
       }
       // The root layout's guard sends a signed-in user to Home.
@@ -50,15 +50,15 @@ export function LoginScreen() {
   };
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Log in to book your next ride.">
+    <AuthLayout title={t('login.title')} subtitle={t('login.subtitle')}>
       <View style={styles.form}>
         {notice === 'password-reset' && !error ? (
-          <Notice tone="success" message="Password updated. Log in with your new password." />
+          <Notice tone="success" message={t('login.passwordReset')} />
         ) : null}
 
         <View style={styles.fields}>
           <TextField
-            label="Phone or email"
+            label={t('login.loginId')}
             icon={User}
             value={loginId}
             onChangeText={setLoginId}
@@ -70,7 +70,7 @@ export function LoginScreen() {
             returnKeyType="next"
           />
           <PasswordField
-            label="Password"
+            label={t('login.password')}
             value={password}
             onChangeText={setPassword}
             autoComplete="current-password"
@@ -79,29 +79,29 @@ export function LoginScreen() {
             onSubmitEditing={() => void onSubmit()}
           />
           <View style={styles.forgot}>
-            <TextLink label="Forgot password?" onPress={() => router.push('/forgot-password')} />
+            <TextLink label={t('login.forgot')} onPress={() => router.push('/forgot-password')} />
           </View>
         </View>
 
         {error ? <Notice tone="error" message={error} /> : null}
 
         <Button
-          label="Log in"
+          label={t('login.submit')}
           disabled={!canSubmit}
           loading={busy}
           onPress={() => void onSubmit()}
           trailing={<ArrowRight size={20} color={colors.onPrimary} weight="bold" />}
         />
 
-        <OrDivider label="or" />
-        <GoogleButton label="Continue with Google" onPress={() => setGoogleTapped(true)} />
+        <OrDivider label={t('auth.or')} />
+        <GoogleButton label={t('auth.continueGoogle')} onPress={() => setGoogleTapped(true)} />
         {googleTapped && !googleReady ? (
-          <Notice message="Google sign-in needs Firebase, which isn't set up on the server yet." />
+          <Notice message={t('auth.googleNotReady')} />
         ) : null}
 
         <SwitchPrompt
-          question="Don't have an account?"
-          action="Sign up"
+          question={t('login.noAccount')}
+          action={t('login.signup')}
           onPress={() => router.replace('/register')}
         />
       </View>
@@ -109,7 +109,7 @@ export function LoginScreen() {
       <View style={styles.spacer} />
 
       <Text style={styles.terms}>
-        By continuing, you agree to our <LegalLinks />.
+        <LegalTerms />
       </Text>
     </AuthLayout>
   );

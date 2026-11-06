@@ -2,21 +2,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HandCoins } from 'phosphor-react-native';
 
+import { useT } from '@alansar/i18n';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
 
 const { radius, spacing, typography } = lightTheme;
 
 /** The product's differentiator: the passenger can offer a fare and drivers accept or counter. */
 export function FareBanner() {
+  const t = useT();
   return (
     <LinearGradient {...gradients.brand} style={styles.banner}>
       <View style={styles.ring} />
       <View style={styles.text}>
-        <Text style={styles.kicker}>ONLY ON AL ANSAR</Text>
-        <Text style={styles.title}>Name your own fare</Text>
-        <Text style={styles.body}>
-          Offer a price. Drivers accept or counter, and you ride only at a fare you agreed.
-        </Text>
+        <Text style={styles.kicker}>{t('home.fareKicker')}</Text>
+        <Text style={styles.title}>{t('home.fareTitle')}</Text>
+        <Text style={styles.body}>{t('home.fareBody')}</Text>
       </View>
       <View style={styles.iconWrap}>
         <HandCoins size={34} color={onHero.text} weight="duotone" />

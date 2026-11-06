@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { authApi, describeError } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { PASSWORD_MIN } from '@alansar/utils';
 
@@ -22,6 +23,7 @@ type Message = { tone: 'error' | 'success'; text: string } | null;
 
 /** Forgot password, step 2: the emailed code and the new password, sent together. */
 export function ResetPasswordScreen() {
+  const t = useT();
   const { email = '' } = useLocalSearchParams<{ email?: string }>();
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
@@ -51,7 +53,7 @@ export function ResetPasswordScreen() {
     setMessage(null);
     try {
       await authApi.forgotPassword(email);
-      setMessage({ tone: 'success', text: `If ${email} has an account, a new code is on its way.` });
+      setMessage({ tone: 'success', text: t('reset.newCodeSent', { email }) });
     } catch (err) {
       setMessage({ tone: 'error', text: describeError(err) });
     }
@@ -59,10 +61,10 @@ export function ResetPasswordScreen() {
 
   return (
     <AuthLayout
-      title="Reset password"
+      title={t('reset.title')}
       subtitle={
         <>
-          Enter the code sent to <HeroStrong>{email}</HeroStrong> and choose a new password.
+          {t('reset.subtitlePre')}<HeroStrong>{email}</HeroStrong>{t('reset.subtitlePost')}
         </>
       }
     >
@@ -70,24 +72,24 @@ export function ResetPasswordScreen() {
 
       <View style={styles.row}>
         <ResendCode seconds={60} onResend={() => void onResend()} />
-        <TextLink label="Change email" onPress={() => router.back()} />
+        <TextLink label={t('reset.changeEmail')} onPress={() => router.back()} />
       </View>
 
       <View style={styles.fields}>
         <PasswordField
-          label={`New password (min. ${PASSWORD_MIN} characters)`}
+          label={t('reset.newPassword', { min: PASSWORD_MIN })}
           value={password}
           onChangeText={setPassword}
           autoComplete="new-password"
           textContentType="newPassword"
         />
         <PasswordField
-          label="Confirm new password"
+          label={t('reset.confirmPassword')}
           value={confirm}
           onChangeText={setConfirm}
           autoComplete="new-password"
           textContentType="newPassword"
-          error={mismatch ? "Passwords don't match" : undefined}
+          error={mismatch ? t('auth.passwordMismatch') : undefined}
         />
       </View>
 
@@ -100,7 +102,7 @@ export function ResetPasswordScreen() {
       <View style={styles.spacer} />
 
       <Button
-        label="Reset password"
+        label={t('reset.submit')}
         disabled={!canSubmit}
         loading={busy}
         onPress={() => void onReset()}

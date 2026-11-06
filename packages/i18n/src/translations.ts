@@ -41,6 +41,9 @@ export const en = {
   'home.firstRide': 'Your first ride is a tap away',
   'home.ridesShowHere': 'Trips you take will show up here.',
   'home.bookRide': 'Book a ride',
+  'home.fareKicker': 'ONLY ON AL ANSAR',
+  'home.fareTitle': 'Name your own fare',
+  'home.fareBody': 'Offer a price. Drivers accept or counter, and you ride only at a fare you agreed.',
 
   // Services
   'services.title': 'Services',
@@ -196,6 +199,74 @@ export const en = {
   // Legal
   'legal.terms.title': 'Terms of Service',
   'legal.privacy.title': 'Privacy Policy',
+  'legal.privacyWord': 'Privacy Policy',
+  'legal.termsAnd': 'By continuing, you agree to our {terms} and {privacy}.',
+
+  // Auth — shared
+  'auth.or': 'or',
+  'auth.continueGoogle': 'Continue with Google',
+  'auth.signupGoogle': 'Sign up with Google',
+  'auth.googleNotReady': "Google sign-in needs Firebase, which isn't set up on the server yet.",
+  'auth.driverAccount': 'This is a driver account. Please log in with the Al Ansar Driver app.',
+  'auth.passwordMismatch': "Passwords don't match",
+  'auth.resendCode': 'Resend code',
+  'auth.resendIn': 'Resend code in {time}',
+  'auth.invalidPhone': 'Enter a valid Bangladeshi mobile number',
+  'auth.invalidEmail': 'Enter a valid email address',
+  'auth.termsShort': 'Terms',
+  'auth.and': ' and ',
+  'auth.agreeTo': 'I agree to the ',
+
+  // Login
+  'login.title': 'Welcome back',
+  'login.subtitle': 'Log in to book your next ride.',
+  'login.passwordReset': 'Password updated. Log in with your new password.',
+  'login.loginId': 'Phone or email',
+  'login.password': 'Password',
+  'login.forgot': 'Forgot password?',
+  'login.submit': 'Log in',
+  'login.noAccount': "Don't have an account?",
+  'login.signup': 'Sign up',
+
+  // Register
+  'register.title': 'Create your account',
+  'register.subtitle': 'Join Al Ansar Ride in under a minute.',
+  'register.fullName': 'Full name',
+  'register.mobile': 'Mobile number',
+  'register.email': 'Email address',
+  'register.password': 'Password (min. {min} characters)',
+  'register.confirmPassword': 'Confirm password',
+  'register.submit': 'Create account',
+  'register.haveAccount': 'Already have an account?',
+  'register.login': 'Log in',
+
+  // Verify
+  'verify.title': 'Verify your email',
+  'verify.subtitle': 'We sent a 6-digit code to {email}.',
+  'verify.changeEmail': 'Change email',
+  'verify.submit': 'Verify and create account',
+  'verify.sendFailed': "We couldn't send the email. Check the address, or tap Resend code.",
+  'verify.sendFailedRetry': "We couldn't send the email. Please try again in a minute.",
+  'verify.codeSentTo': 'Enter the 6-digit code sent to ',
+  'verify.newCodeSent': 'A new code is on its way to {email}.',
+
+  // Forgot password
+  'forgot.title': 'Forgot password?',
+  'forgot.subtitle': "Enter your account's email and we'll send you a code to reset it.",
+  'forgot.email': 'Email address',
+  'forgot.submit': 'Send code',
+  'forgot.remembered': 'Remembered it?',
+  'forgot.login': 'Log in',
+
+  // Reset password
+  'reset.title': 'Reset password',
+  'reset.subtitlePre': 'Enter the code sent to ',
+  'reset.subtitlePost': ' and choose a new password.',
+  'reset.changeEmail': 'Change email',
+  'reset.newPassword': 'New password (min. {min} characters)',
+  'reset.confirmPassword': 'Confirm new password',
+  'reset.submit': 'Reset password',
+  'reset.newCodeSent': 'If {email} has an account, a new code is on its way.',
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -238,6 +309,9 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'home.firstRide': 'আপনার প্রথম যাত্রা এক ট্যাপ দূরে',
   'home.ridesShowHere': 'আপনার যাত্রাগুলো এখানে দেখা যাবে।',
   'home.bookRide': 'যাত্রা বুক করুন',
+  'home.fareKicker': 'শুধুমাত্র আল আনসারে',
+  'home.fareTitle': 'নিজের ভাড়া বলুন',
+  'home.fareBody': 'দাম প্রস্তাব করুন। চালক মানবে বা পাল্টা দাম দেবে, আপনি যে ভাড়ায় রাজি শুধু সেই ভাড়াতেই যাবেন।',
 
   // Services
   'services.title': 'সেবা',
@@ -393,6 +467,74 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   // Legal
   'legal.terms.title': 'সেবার শর্তাবলী',
   'legal.privacy.title': 'গোপনীয়তা নীতি',
+  'legal.privacyWord': 'গোপনীয়তা নীতি',
+  'legal.termsAnd': 'চালিয়ে গেলে আপনি আমাদের {terms} ও {privacy} মেনে নিচ্ছেন।',
+
+  // Auth — shared
+  'auth.or': 'অথবা',
+  'auth.continueGoogle': 'গুগল দিয়ে চালিয়ে যান',
+  'auth.signupGoogle': 'গুগল দিয়ে সাইন আপ',
+  'auth.googleNotReady': 'গুগল সাইন-ইনের জন্য Firebase দরকার, যা এখনো সার্ভারে সেট করা হয়নি।',
+  'auth.driverAccount': 'এটি একটি চালক অ্যাকাউন্ট। অনুগ্রহ করে আল আনসার ড্রাইভার অ্যাপ দিয়ে লগ ইন করুন।',
+  'auth.passwordMismatch': 'পাসওয়ার্ড মিলছে না',
+  'auth.resendCode': 'আবার কোড পাঠান',
+  'auth.resendIn': '{time} পরে আবার কোড পাঠান',
+  'auth.invalidPhone': 'একটি সঠিক বাংলাদেশি মোবাইল নম্বর দিন',
+  'auth.invalidEmail': 'একটি সঠিক ইমেইল ঠিকানা দিন',
+  'auth.termsShort': 'শর্তাবলী',
+  'auth.and': ' ও ',
+  'auth.agreeTo': 'আমি সম্মত ',
+
+  // Login
+  'login.title': 'আবার স্বাগতম',
+  'login.subtitle': 'পরের যাত্রা বুক করতে লগ ইন করুন।',
+  'login.passwordReset': 'পাসওয়ার্ড হালনাগাদ হয়েছে। নতুন পাসওয়ার্ড দিয়ে লগ ইন করুন।',
+  'login.loginId': 'ফোন বা ইমেইল',
+  'login.password': 'পাসওয়ার্ড',
+  'login.forgot': 'পাসওয়ার্ড ভুলে গেছেন?',
+  'login.submit': 'লগ ইন',
+  'login.noAccount': 'অ্যাকাউন্ট নেই?',
+  'login.signup': 'সাইন আপ',
+
+  // Register
+  'register.title': 'আপনার অ্যাকাউন্ট তৈরি করুন',
+  'register.subtitle': 'এক মিনিটেই আল আনসার রাইডে যোগ দিন।',
+  'register.fullName': 'পুরো নাম',
+  'register.mobile': 'মোবাইল নম্বর',
+  'register.email': 'ইমেইল ঠিকানা',
+  'register.password': 'পাসওয়ার্ড (কমপক্ষে {min} অক্ষর)',
+  'register.confirmPassword': 'পাসওয়ার্ড নিশ্চিত করুন',
+  'register.submit': 'অ্যাকাউন্ট তৈরি করুন',
+  'register.haveAccount': 'আগে থেকেই অ্যাকাউন্ট আছে?',
+  'register.login': 'লগ ইন',
+
+  // Verify
+  'verify.title': 'আপনার ইমেইল যাচাই করুন',
+  'verify.subtitle': 'আমরা {email} এ একটি ৬-সংখ্যার কোড পাঠিয়েছি।',
+  'verify.changeEmail': 'ইমেইল পরিবর্তন',
+  'verify.submit': 'যাচাই করে অ্যাকাউন্ট তৈরি করুন',
+  'verify.sendFailed': 'আমরা ইমেইল পাঠাতে পারিনি। ঠিকানা দেখুন, অথবা আবার কোড পাঠান চাপুন।',
+  'verify.sendFailedRetry': 'আমরা ইমেইল পাঠাতে পারিনি। এক মিনিট পর আবার চেষ্টা করুন।',
+  'verify.codeSentTo': '৬-সংখ্যার কোডটি দিন যা পাঠানো হয়েছে ',
+  'verify.newCodeSent': '{email} এ একটি নতুন কোড পাঠানো হচ্ছে।',
+
+  // Forgot password
+  'forgot.title': 'পাসওয়ার্ড ভুলে গেছেন?',
+  'forgot.subtitle': 'আপনার অ্যাকাউন্টের ইমেইল দিন, আমরা রিসেট করার কোড পাঠাব।',
+  'forgot.email': 'ইমেইল ঠিকানা',
+  'forgot.submit': 'কোড পাঠান',
+  'forgot.remembered': 'মনে পড়েছে?',
+  'forgot.login': 'লগ ইন',
+
+  // Reset password
+  'reset.title': 'পাসওয়ার্ড রিসেট',
+  'reset.subtitlePre': 'পাঠানো কোডটি দিন ',
+  'reset.subtitlePost': ' এবং নতুন পাসওয়ার্ড বেছে নিন।',
+  'reset.changeEmail': 'ইমেইল পরিবর্তন',
+  'reset.newPassword': 'নতুন পাসওয়ার্ড (কমপক্ষে {min} অক্ষর)',
+  'reset.confirmPassword': 'নতুন পাসওয়ার্ড নিশ্চিত করুন',
+  'reset.submit': 'পাসওয়ার্ড রিসেট',
+  'reset.newCodeSent': '{email} এর অ্যাকাউন্ট থাকলে, একটি নতুন কোড পাঠানো হচ্ছে।',
 };
 
 export const translations = { en, bn } as const;

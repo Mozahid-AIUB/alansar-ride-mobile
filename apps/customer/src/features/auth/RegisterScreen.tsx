@@ -5,6 +5,7 @@ import { EnvelopeSimple, User } from 'phosphor-react-native';
 
 import { authApi, describeError } from '@alansar/api';
 import { googleReady, signIn } from '@alansar/auth';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { isValidBdMobile, isValidEmail, PASSWORD_MIN, toE164Bd } from '@alansar/utils';
 
@@ -15,14 +16,7 @@ import { PasswordField } from '@/components/PasswordField';
 import { TextField } from '@/components/TextField';
 
 import { AuthLayout } from './AuthLayout';
-import {
-  GoogleButton,
-  INVALID_EMAIL,
-  INVALID_PHONE,
-  LegalLinks,
-  OrDivider,
-  SwitchPrompt,
-} from './AuthParts';
+import { GoogleButton, LegalLinks, OrDivider, SwitchPrompt } from './AuthParts';
 import { PhoneField } from './PhoneField';
 
 const { spacing } = lightTheme;
@@ -32,6 +26,7 @@ const { spacing } = lightTheme;
  * emails a code; the account is created when that code is verified.
  */
 export function RegisterScreen() {
+  const t = useT();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -82,11 +77,11 @@ export function RegisterScreen() {
   };
 
   return (
-    <AuthLayout title="Create your account" subtitle="Join Al Ansar Ride in under a minute.">
+    <AuthLayout title={t('register.title')} subtitle={t('register.subtitle')}>
       <View style={styles.form}>
         <View style={styles.fields}>
           <TextField
-            label="Full name"
+            label={t('register.fullName')}
             icon={User}
             value={name}
             onChangeText={setName}
@@ -96,13 +91,13 @@ export function RegisterScreen() {
             returnKeyType="next"
           />
           <PhoneField
-            label="Mobile number"
+            label={t('register.mobile')}
             value={phone}
             onChange={setPhone}
-            error={phone.length === 10 && !phoneValid ? INVALID_PHONE : undefined}
+            error={phone.length === 10 && !phoneValid ? t('auth.invalidPhone') : undefined}
           />
           <TextField
-            label="Email address"
+            label={t('register.email')}
             icon={EnvelopeSimple}
             value={email}
             onChangeText={setEmail}
@@ -111,47 +106,47 @@ export function RegisterScreen() {
             textContentType="emailAddress"
             autoCapitalize="none"
             autoCorrect={false}
-            error={email.trim() !== '' && !emailValid ? INVALID_EMAIL : undefined}
+            error={email.trim() !== '' && !emailValid ? t('auth.invalidEmail') : undefined}
           />
           <PasswordField
-            label={`Password (min. ${PASSWORD_MIN} characters)`}
+            label={t('register.password', { min: PASSWORD_MIN })}
             value={password}
             onChangeText={setPassword}
             autoComplete="new-password"
             textContentType="newPassword"
           />
           <PasswordField
-            label="Confirm password"
+            label={t('register.confirmPassword')}
             value={confirm}
             onChangeText={setConfirm}
             autoComplete="new-password"
             textContentType="newPassword"
-            error={mismatch ? "Passwords don't match" : undefined}
+            error={mismatch ? t('auth.passwordMismatch') : undefined}
           />
         </View>
 
         <Checkbox checked={agreed} onChange={setAgreed}>
-          I agree to the <LegalLinks short />
+          {t('auth.agreeTo')}<LegalLinks short />
         </Checkbox>
 
         {error ? <Notice tone="error" message={error} /> : null}
 
         <Button
-          label="Create account"
+          label={t('register.submit')}
           disabled={!canSubmit}
           loading={busy}
           onPress={() => void onSubmit()}
         />
 
-        <OrDivider label="or" />
-        <GoogleButton label="Sign up with Google" onPress={() => setGoogleTapped(true)} />
+        <OrDivider label={t('auth.or')} />
+        <GoogleButton label={t('auth.signupGoogle')} onPress={() => setGoogleTapped(true)} />
         {googleTapped && !googleReady ? (
-          <Notice message="Google sign-up needs Firebase, which isn't set up on the server yet." />
+          <Notice message={t('auth.googleNotReady')} />
         ) : null}
 
         <SwitchPrompt
-          question="Already have an account?"
-          action="Log in"
+          question={t('register.haveAccount')}
+          action={t('register.login')}
           onPress={() => router.replace('/login')}
         />
       </View>
