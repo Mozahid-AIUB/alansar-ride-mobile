@@ -262,6 +262,18 @@ export const en = {
   'driverHome.noRequests': 'No ride requests yet. Stay online.',
   'driverHome.logout': 'Log out',
 
+  // Driver — ride request / offer
+  'request.riderFare': 'Rider offered',
+  'request.estimated': 'Estimated',
+  'request.km': '{km} km',
+  'request.accept': 'Accept {fare}',
+  'request.counter': 'Offer my price',
+  'request.yourPrice': 'Your price (৳)',
+  'request.sendOffer': 'Send offer',
+  'request.cancel': 'Cancel',
+  'request.offerSent': 'Offer sent. Waiting for the rider.',
+  'request.offerFailed': "Couldn't send the offer. Try again.",
+
   // Legal
   'legal.terms.title': 'Terms of Service',
   'legal.privacy.title': 'Privacy Policy',
@@ -595,6 +607,18 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'driverHome.earnings': 'আয়',
   'driverHome.noRequests': 'এখনো কোনো যাত্রার অনুরোধ নেই। অনলাইনে থাকুন।',
   'driverHome.logout': 'লগ আউট',
+
+  // Driver — ride request / offer
+  'request.riderFare': 'যাত্রী দিয়েছে',
+  'request.estimated': 'আনুমানিক',
+  'request.km': '{km} কিমি',
+  'request.accept': '{fare} গ্রহণ করুন',
+  'request.counter': 'আমার দাম বলি',
+  'request.yourPrice': 'আপনার দাম (৳)',
+  'request.sendOffer': 'প্রস্তাব পাঠান',
+  'request.cancel': 'বাতিল',
+  'request.offerSent': 'প্রস্তাব পাঠানো হয়েছে। যাত্রীর অপেক্ষায়।',
+  'request.offerFailed': 'প্রস্তাব পাঠানো যায়নি। আবার চেষ্টা করুন।',
 
   // Legal
   'legal.terms.title': 'সেবার শর্তাবলী',

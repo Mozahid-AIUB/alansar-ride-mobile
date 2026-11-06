@@ -1,5 +1,7 @@
 import { request } from './client';
 import type {
+  DriverEarnings,
+  DriverProfile,
   FareEstimate,
   FareOffer,
   Pagination,
@@ -92,4 +94,39 @@ export const vehiclesApi = {
   /** Active vehicle types with how many drivers of each are free right now. */
   availability: () =>
     request<VehicleType[]>('GET', '/drivers/vehicle-types/availability', undefined, { auth: true }),
+};
+
+/** `/api/drivers/*` and the driver side of `/api/rides/*` — see driver.routes.js / ride.routes.js. */
+export const driversApi = {
+  /** The signed-in driver's own profile. */
+  me: () => request<DriverProfile>('GET', '/drivers/me', undefined, { auth: true }),
+
+  /** Go online (offered rides) or offline. */
+  setStatus: (driverId: string, online: boolean) =>
+    request<{ status: string }>('PUT', `/drivers/${driverId}/status`, { online }, { auth: true }),
+
+  /** Report the driver's current position (no map; coordinates only). */
+  updateLocation: (driverId: string, latitude: number, longitude: number) =>
+    request<unknown>('PUT', `/drivers/${driverId}/location`, { latitude, longitude }, { auth: true }),
+
+  /** Today's and lifetime earnings for the driver. */
+  earnings: (driverId: string) =>
+    request<DriverEarnings>('GET', `/drivers/${driverId}/earnings`, undefined, { auth: true }),
+
+  /** Ride requests this driver can offer on right now. */
+  availableRides: () => request<RideDetail[]>('GET', '/rides/available', undefined, { auth: true }),
+
+  /** Offer a fare on a request (the driver's price; the rider accepts or counters). */
+  makeOffer: (rideId: string, amount: number, note?: string) =>
+    request<FareOffer>('POST', `/rides/${rideId}/offers`, { amount, note }, { auth: true }),
+
+  /** The offers this driver has made on a ride. */
+  myOffers: (rideId: string) =>
+    request<FareOffer[]>('GET', `/rides/${rideId}/offers/mine`, undefined, { auth: true }),
+
+  /** Trip lifecycle, once the driver is assigned. */
+  arrive: (rideId: string) => request<RideDetail>('PUT', `/rides/${rideId}/arrive`, undefined, { auth: true }),
+  start: (rideId: string) => request<RideDetail>('PUT', `/rides/${rideId}/start`, undefined, { auth: true }),
+  complete: (rideId: string, finalFare?: number) =>
+    request<RideDetail>('PUT', `/rides/${rideId}/complete`, finalFare ? { finalFare } : undefined, { auth: true }),
 };

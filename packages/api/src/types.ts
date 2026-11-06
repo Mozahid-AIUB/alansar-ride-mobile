@@ -12,6 +12,34 @@ export type User = {
   created_at: string;
 };
 
+/** The driver's own profile (GET /api/drivers/me → driver.service getById). */
+export type DriverProfile = {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  email: string | null;
+  avatar_url: string | null;
+  status: string;
+  is_online?: boolean;
+  verification_status?: string;
+  rating?: Numeric | null;
+  vehicle_type_name?: string | null;
+  vehicle_registration?: string | null;
+};
+
+/** GET /api/drivers/:id/earnings (driver.service earnings()). */
+export type DriverEarnings = {
+  today_rides: number;
+  today_earnings: Numeric;
+  week_rides: number;
+  week_earnings: Numeric;
+  month_rides: number;
+  month_earnings: Numeric;
+  total_rides: number;
+  total_earnings: Numeric;
+  average_fare: Numeric;
+};
+
 export type Tokens = {
   accessToken: string;
   refreshToken: string;

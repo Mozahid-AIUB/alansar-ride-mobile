@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { CurrencyCircleDollar, MapPinLine, SteeringWheel } from 'phosphor-react-native';
@@ -6,8 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useT } from '@alansar/i18n';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
+import { formatTaka } from '@alansar/utils';
 
 import { PressableScale } from '@/components/PressableScale';
+import { RideRequestCard } from '@/features/requests/RideRequestCard';
+import { useAvailableRides, useDriverEarnings } from '@/hooks/queries';
 import { useSession } from '@/hooks/useSession';
 import { driverStatus, useDriverOnline } from '@/store/driverStatus';
 
@@ -19,8 +23,20 @@ export function DriverHomeScreen() {
   const t = useT();
   const state = useSession();
   const online = useDriverOnline();
+  const [busy, setBusy] = useState(false);
+  const earnings = useDriverEarnings();
+  const requests = useAvailableRides(online);
 
   const name = state.status === 'signedIn' ? (state.user.full_name?.split(' ')[0] ?? 'driver') : 'driver';
+  const todayRides = Number(earnings.data?.today_rides ?? 0);
+  const todayEarnings = Number(earnings.data?.today_earnings ?? 0);
+  const rides = requests.data ?? [];
+
+  const onToggle = async () => {
+    setBusy(true);
+    await driverStatus.toggle();
+    setBusy(false);
+  };
 
   return (
     <View style={styles.root}>
@@ -42,11 +58,16 @@ export function DriverHomeScreen() {
           <PressableScale
             accessibilityRole="button"
             style={[styles.toggle, online ? styles.toggleOff : styles.toggleOn]}
-            onPress={() => driverStatus.toggle()}
+            disabled={busy}
+            onPress={() => void onToggle()}
           >
-            <Text style={[styles.toggleText, online ? styles.toggleTextOff : styles.toggleTextOn]}>
-              {online ? t('driverHome.goOffline') : t('driverHome.goOnline')}
-            </Text>
+            {busy ? (
+              <ActivityIndicator color={online ? colors.text : colors.onPrimary} />
+            ) : (
+              <Text style={[styles.toggleText, online ? styles.toggleTextOff : styles.toggleTextOn]}>
+                {online ? t('driverHome.goOffline') : t('driverHome.goOnline')}
+              </Text>
+            )}
           </PressableScale>
         </LinearGradient>
 
@@ -54,19 +75,29 @@ export function DriverHomeScreen() {
           <View style={styles.stats}>
             <View style={styles.stat}>
               <MapPinLine size={22} color={colors.brand} weight="duotone" />
-              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statValue}>{todayRides}</Text>
               <Text style={styles.statLabel}>{t('driverHome.today')}</Text>
             </View>
             <View style={styles.stat}>
               <CurrencyCircleDollar size={22} color={colors.brand} weight="duotone" />
-              <Text style={styles.statValue}>৳0</Text>
+              <Text style={styles.statValue}>{formatTaka(todayEarnings)}</Text>
               <Text style={styles.statLabel}>{t('driverHome.earnings')}</Text>
             </View>
           </View>
 
-          <View style={styles.requests}>
-            <Text style={styles.requestsText}>{t('driverHome.noRequests')}</Text>
-          </View>
+          {online && rides.length ? (
+            <View style={styles.requestList}>
+              {rides.map((ride) => (
+                <RideRequestCard key={ride.id} ride={ride} />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.requests}>
+              <Text style={styles.requestsText}>
+                {online ? t('driverHome.noRequests') : t('driverHome.offlineBody')}
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -187,5 +218,8 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textSubtle,
     textAlign: 'center',
+  },
+  requestList: {
+    gap: spacing.md,
   },
 });
