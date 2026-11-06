@@ -6,12 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import {
   CalendarCheck,
   CaretRight,
-  CheckCircle,
-  GlobeHemisphereEast,
-  MapTrifold,
   EnvelopeSimple,
   FileText,
+  GearSix,
   Lifebuoy,
+  Pencil,
   Phone,
   ShieldCheck,
   SignOut,
@@ -20,34 +19,33 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { signOut } from '@alansar/auth';
+import { useLanguage, useT } from '@alansar/i18n';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
 import { formatBdPhone, initialsOf } from '@alansar/utils';
 
 import { MapArt } from '@/components/illustrations/MapArt';
 import { PressableScale } from '@/components/PressableScale';
-import { Toast, useToast } from '@/components/Toast';
 import { useSession } from '@/hooks/useSession';
-import { hasMapboxToken } from '@/components/map/mapConfig';
-import { mapPrefs, useMapProvider, type MapProvider } from '@/store/mapPrefs';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
-const memberSince = (iso: string) => {
+const memberSince = (iso: string, locale: string) => {
   const date = new Date(iso);
   return Number.isNaN(date.getTime())
     ? ''
-    : date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    : date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 };
 
 export function AccountScreen() {
   const insets = useSafeAreaInsets();
   const state = useSession();
-  const toast = useToast();
+  const t = useT();
+  const lang = useLanguage();
 
   if (state.status !== 'signedIn') return null;
   const { user } = state;
-  const name = user.full_name?.trim() || 'Al Ansar rider';
-  const since = memberSince(user.created_at);
+  const name = user.full_name?.trim() || t('account.riderFallback');
+  const since = memberSince(user.created_at, lang === 'bn' ? 'bn-BD' : 'en-GB');
 
   return (
     <View style={styles.root}>
@@ -62,40 +60,31 @@ export function AccountScreen() {
             <Text style={styles.avatarText}>{initialsOf(name) || 'A'}</Text>
           </View>
           <Text style={styles.name}>{name}</Text>
-          {since ? <Text style={styles.since}>Member since {since}</Text> : null}
+          {since ? <Text style={styles.since}>{t('account.memberSince', { month: since })}</Text> : null}
         </LinearGradient>
 
         <View style={styles.body}>
-          <Group title="Personal info">
-            {user.phone ? <InfoRow icon={Phone} label="Mobile" value={formatBdPhone(user.phone)} /> : null}
-            {user.email ? <InfoRow icon={EnvelopeSimple} label="Email" value={user.email} /> : null}
-            <InfoRow icon={ShieldCheck} label="Account" value={user.status === 'active' ? 'Active' : user.status} />
+          <Group title={t('account.personalInfo')}>
+            {user.phone ? <InfoRow icon={Phone} label={t('account.mobile')} value={formatBdPhone(user.phone)} /> : null}
+            {user.email ? <InfoRow icon={EnvelopeSimple} label={t('account.email')} value={user.email} /> : null}
+            <InfoRow icon={ShieldCheck} label={t('account.account')} value={user.status === 'active' ? t('account.active') : user.status} />
+            <ActionRow icon={Pencil} label={t('account.editProfile')} onPress={() => router.navigate('/profile')} />
           </Group>
 
-          <Group title="Map">
-            <MapOption value="google" icon={MapTrifold} label="Google Maps" body="Default. Apple Maps on iPhone." />
-            <MapOption
-              value="mapbox"
-              icon={GlobeHemisphereEast}
-              label="Mapbox"
-              body={hasMapboxToken ? 'Clean, detailed maps by Mapbox.' : 'Needs a Mapbox token; showing OpenStreetMap for now.'}
-            />
-          </Group>
-
-          <Group title="More">
-            <ActionRow icon={CalendarCheck} label="Scheduled rides" onPress={() => router.navigate('/activity')} />
-            <ActionRow icon={Lifebuoy} label="Help & support" onPress={() => toast.show('Support chat is coming soon.')} />
-            <ActionRow icon={FileText} label="Terms & privacy" onPress={() => toast.show('Terms and privacy pages are coming soon.')} />
+          <Group title={t('account.more')}>
+            <ActionRow icon={GearSix} label={t('account.settings')} onPress={() => router.navigate('/settings')} />
+            <ActionRow icon={CalendarCheck} label={t('account.scheduledRides')} onPress={() => router.navigate('/activity')} />
+            <ActionRow icon={Lifebuoy} label={t('account.help')} onPress={() => router.navigate('/support')} />
+            <ActionRow icon={FileText} label={t('account.terms')} onPress={() => router.navigate('/legal/terms')} />
           </Group>
 
           <View style={styles.group}>
-            <ActionRow icon={SignOut} label="Log out" tone="danger" onPress={() => void signOut()} />
+            <ActionRow icon={SignOut} label={t('account.logout')} tone="danger" onPress={() => void signOut()} />
           </View>
 
           <Text style={styles.version}>Al Ansar Ride · v2.0.0</Text>
         </View>
       </ScrollView>
-      <Toast toast={toast.toast} />
     </View>
   );
 }
@@ -106,41 +95,6 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
       <Text style={styles.groupTitle}>{title}</Text>
       <View style={styles.group}>{children}</View>
     </View>
-  );
-}
-
-function MapOption({
-  value,
-  icon: Icon,
-  label,
-  body,
-}: {
-  value: MapProvider;
-  icon: ComponentType<IconProps>;
-  label: string;
-  body: string;
-}) {
-  const selected = useMapProvider() === value;
-  return (
-    <PressableScale
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      style={styles.row}
-      onPress={() => mapPrefs.set(value)}
-    >
-      <View style={styles.rowIcon}>
-        <Icon size={20} color={colors.text} weight="duotone" />
-      </View>
-      <View style={styles.rowText}>
-        <Text style={styles.actionLabel}>{label}</Text>
-        <Text style={styles.rowLabel}>{body}</Text>
-      </View>
-      {selected ? (
-        <CheckCircle size={22} color={colors.brand} weight="fill" />
-      ) : (
-        <View style={styles.radio} />
-      )}
-    </PressableScale>
   );
 }
 

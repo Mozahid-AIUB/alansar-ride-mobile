@@ -333,7 +333,15 @@ importers:
         specifier: workspace:*
         version: link:../api
 
-  packages/i18n: {}
+  packages/i18n:
+    dependencies:
+      react:
+        specifier: '*'
+        version: 19.2.3
+    devDependencies:
+      '@types/react':
+        specifier: '*'
+        version: 19.2.18
 
   packages/maps: {}
 

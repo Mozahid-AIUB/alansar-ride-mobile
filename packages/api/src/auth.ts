@@ -1,6 +1,13 @@
 import { request } from './client';
 import type { AuthSession, CodeSent, Registration, Tokens, User } from './types';
 
+/** `/api/users/*` — the signed-in user's own profile. */
+export const usersApi = {
+  /** Update the signed-in user's editable fields. Returns the fresh user. */
+  updateMe: (input: { fullName?: string; email?: string }) =>
+    request<User>('PUT', '/users/me', input, { auth: true }),
+};
+
 /** `/api/auth/*` — see the API's routes/auth.routes.js. */
 export const authApi = {
   /** `identifier` is an email if it contains "@", otherwise a phone number in any spelling. */

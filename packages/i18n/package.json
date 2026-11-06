@@ -4,5 +4,11 @@
   "private": true,
   "description": "Bangla and English strings.",
   "main": "src/index.ts",
-  "types": "src/index.ts"
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "react": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*"
+  }
 }

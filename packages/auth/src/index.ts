@@ -55,6 +55,12 @@ export async function signOut() {
   setState({ status: 'signedOut' });
 }
 
+/** Replace the signed-in user (e.g. after a profile edit), keeping the tokens. */
+export async function updateUser(user: User) {
+  if (state.status !== 'signedIn') return;
+  await signIn({ user, tokens: state.tokens });
+}
+
 const rejected = (err: unknown) =>
   err instanceof ApiError && (err.status === 401 || err.status === 403);
 
