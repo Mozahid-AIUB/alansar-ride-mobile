@@ -15,12 +15,15 @@ const GLASS = palette.ink100;
 const GREEN = palette.green500;
 const LIGHT = palette.lime;
 
-type Kind = 'car' | 'premium' | 'motorcycle' | 'scooter' | 'auto' | 'rickshaw';
+type Kind = 'car' | 'premium' | 'motorcycle' | 'scooter' | 'auto' | 'mishuk' | 'rickshaw';
 
 export const vehicleKind = (slug: string): Kind => {
   const s = slug.toLowerCase();
+  // Mishuk first: a small boxy battery/engine auto, distinct from both the
+  // green CNG and the pedalled cycle-rickshaw.
+  if (s.includes('mishuk') || s.includes('leguna') || s.includes('tempo')) return 'mishuk';
   if (s.includes('auto') || s.includes('cng')) return 'auto';
-  if (s.includes('rickshaw') || s.includes('mishuk')) return 'rickshaw';
+  if (s.includes('rickshaw') || s.includes('ricksha') || s.includes('cycle')) return 'rickshaw';
   if (s.includes('motor')) return 'motorcycle';
   if (s.includes('bike') || s.includes('scoot')) return 'scooter';
   if (s.includes('private') || s.includes('premium') || s.includes('suv')) return 'premium';
@@ -154,12 +157,41 @@ function Rickshaw() {
   );
 }
 
+/**
+ * Mishuk / leguna: a small boxy three-wheeler, more enclosed and upright than
+ * the CNG — flat windscreen, square cabin, a single front wheel.
+ */
+function Mishuk() {
+  return (
+    <G>
+      <Shadow />
+      {/* roof rack */}
+      <Rect x={16} y={4} width={30} height={2} rx={1} fill={INK} />
+      {/* boxy cabin */}
+      <Path d="M16 24V9a3 3 0 0 1 3-3h24a3 3 0 0 1 3 3v3l5 3a3 3 0 0 1 1.4 2.6V24a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2z" fill={GREEN} />
+      {/* windscreen + side window */}
+      <Rect x={20} y={10} width={11} height={8} rx={1.5} fill={GLASS} />
+      <Rect x={34} y={10} width={9} height={8} rx={1.5} fill={GLASS} />
+      {/* front snout glass */}
+      <Path d="M47 13l4 2.2a2 2 0 0 1 1 1.8V18h-5z" fill={GLASS} />
+      {/* trim + headlight */}
+      <Rect x={16} y={22} width={38} height={1.6} rx={0.8} fill={LIGHT} />
+      <Circle cx={52.5} cy={20} r={1.3} fill={LIGHT} />
+      {/* three wheels: two rear, one front */}
+      <Wheel cx={23} cy={28} r={5} />
+      <Wheel cx={33} cy={28} r={5} />
+      <Wheel cx={50} cy={28} r={4.5} />
+    </G>
+  );
+}
+
 const ART: Record<Kind, () => React.JSX.Element> = {
   car: Car,
   premium: Premium,
   motorcycle: Motorcycle,
   scooter: Scooter,
   auto: Auto,
+  mishuk: Mishuk,
   rickshaw: Rickshaw,
 };
 
