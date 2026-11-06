@@ -13,6 +13,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError, ridesApi, type FareOffer, type RideDetail } from '@alansar/api';
+import { useT, type TranslationKey } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { formatRideDate, formatTaka } from '@alansar/utils';
 
@@ -30,7 +31,12 @@ import { RatingPanel } from './RatingPanel';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
-const CANCEL_REASONS = ['Changed my plans', 'Driver is too far', 'Booked by mistake', 'Found another ride'];
+const CANCEL_REASON_KEYS: TranslationKey[] = [
+  'trip.cancel.plans',
+  'trip.cancel.farAway',
+  'trip.cancel.mistake',
+  'trip.cancel.another',
+];
 
 const coord = (lat: unknown, lng: unknown): Coord | null =>
   lat !== null && lat !== undefined && lng !== null && lng !== undefined
@@ -40,24 +46,27 @@ const coord = (lat: unknown, lng: unknown): Coord | null =>
 const isUpcoming = (ride: RideDetail) =>
   ride.status === 'requested' && !!ride.scheduled_for && !ride.dispatched_at;
 
+type T = (key: TranslationKey, vars?: Record<string, string | number>) => string;
+
 /** What the passenger should know right now, by ride status. */
-const headline = (ride: RideDetail) => {
-  if (isUpcoming(ride)) return { title: 'Ride scheduled', body: `For ${formatRideDate(ride.scheduled_for ?? undefined)}. We'll find your driver ahead of time.` };
+const headline = (ride: RideDetail, t: T) => {
+  if (isUpcoming(ride))
+    return { title: t('trip.scheduled'), body: t('trip.scheduledBody', { when: formatRideDate(ride.scheduled_for ?? undefined) }) };
   switch (ride.status) {
     case 'requested':
-      return { title: 'Finding your driver', body: 'Hang tight while we match you with a nearby driver.' };
+      return { title: t('trip.finding'), body: t('trip.findingBody') };
     case 'accepted':
       return ride.arrived_at
-        ? { title: 'Your driver is here', body: 'Meet them at the pickup point.' }
-        : { title: 'Driver on the way', body: 'Your driver is heading to the pickup point.' };
+        ? { title: t('trip.driverHere'), body: t('trip.driverHereBody') }
+        : { title: t('trip.onWay'), body: t('trip.onWayBody') };
     case 'started':
-      return { title: 'On your way', body: `Heading to ${ride.dropoff_name ?? ride.dropoff_address ?? 'your destination'}.` };
+      return { title: t('trip.started'), body: t('trip.startedBody', { dest: ride.dropoff_name ?? ride.dropoff_address ?? t('trip.destination') }) };
     case 'completed':
-      return { title: "You've arrived", body: 'Thanks for riding with Al Ansar.' };
+      return { title: t('trip.arrived'), body: t('trip.arrivedBody') };
     case 'cancelled':
-      return { title: 'Ride cancelled', body: ride.cancellation_reason ?? 'This ride was cancelled.' };
+      return { title: t('trip.cancelled'), body: ride.cancellation_reason ?? t('trip.cancelledBody') };
     default:
-      return { title: 'Your ride', body: '' };
+      return { title: t('trip.yourRide'), body: '' };
   }
 };
 
@@ -66,6 +75,7 @@ export function TripScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  const t = useT();
   const ride = useRide(id);
   const data = ride.data;
 
@@ -107,12 +117,12 @@ export function TripScreen() {
     return (
       <View style={[styles.center, { paddingTop: insets.top }]}>
         <Notice tone="error" message={describeError(ride.error)} />
-        <Button variant="outline" label="Back to home" onPress={() => router.replace('/home')} />
+        <Button variant="outline" label={t('trip.backHome')} onPress={() => router.replace('/home')} />
       </View>
     );
   }
 
-  const info = data ? headline(data) : null;
+  const info = data ? headline(data, t) : null;
   const finished = data?.status === 'completed' || data?.status === 'cancelled';
   const canCancel = !!data && (data.status === 'requested' || data.status === 'accepted');
   const fare = data ? formatTaka(data.final_fare ?? data.agreed_fare ?? data.requested_fare) : '';
@@ -139,7 +149,7 @@ export function TripScreen() {
           showsVerticalScrollIndicator={false}
         >
           {!data || !info ? (
-            <Text style={styles.muted}>Loading your ride…</Text>
+            <Text style={styles.muted}>{t('trip.loading')}</Text>
           ) : (
             <>
               <View style={styles.status}>
@@ -165,16 +175,16 @@ export function TripScreen() {
               {offerAction.isError ? <Notice tone="error" message={describeError(offerAction.error)} /> : null}
 
               <View style={styles.tripCard}>
-                <TripLine color="pickup" text={data.pickup_name ?? data.pickup_address ?? 'Pickup'} />
+                <TripLine color="pickup" text={data.pickup_name ?? data.pickup_address ?? t('trip.pickup')} />
                 <View style={styles.tripDivider} />
-                <TripLine color="dropoff" text={data.dropoff_name ?? data.dropoff_address ?? 'Destination'} />
+                <TripLine color="dropoff" text={data.dropoff_name ?? data.dropoff_address ?? t('trip.dropoff')} />
                 <View style={styles.fareRow}>
                   <Text style={styles.fareLabel}>
-                    {data.status === 'completed' ? 'Fare paid' : data.agreed_fare ? 'Agreed fare' : 'Your fare'}
+                    {data.status === 'completed' ? t('trip.farePaid') : data.agreed_fare ? t('trip.agreedFare') : t('trip.yourFare')}
                   </Text>
                   <Text style={styles.fare}>{fare}</Text>
                 </View>
-                <Text style={styles.cash}>Pay your driver in cash at the end of the trip.</Text>
+                <Text style={styles.cash}>{t('trip.cash')}</Text>
               </View>
 
               {data.status === 'completed' && !rated ? (
@@ -190,38 +200,41 @@ export function TripScreen() {
 
               {finished && (data.status === 'cancelled' || rated) ? (
                 <View style={styles.actions}>
-                  <Button label="Book another ride" onPress={() => startBooking()} />
-                  <Button variant="outline" label="Back to home" onPress={() => router.replace('/home')} />
+                  <Button label={t('trip.bookAnother')} onPress={() => startBooking()} />
+                  <Button variant="outline" label={t('trip.backHome')} onPress={() => router.replace('/home')} />
                 </View>
               ) : null}
 
               {canCancel ? (
                 cancelling ? (
                   <View style={styles.cancelBox}>
-                    <Text style={styles.cancelTitle}>Why are you cancelling?</Text>
+                    <Text style={styles.cancelTitle}>{t('trip.whyCancel')}</Text>
                     <View style={styles.reasons}>
-                      {CANCEL_REASONS.map((r) => (
-                        <PressableScale
-                          key={r}
-                          accessibilityRole="button"
-                          accessibilityState={{ selected: reason === r }}
-                          style={[styles.reason, reason === r && styles.reasonSelected]}
-                          onPress={() => setReason(r)}
-                        >
-                          <Text style={[styles.reasonText, reason === r && styles.reasonTextSelected]}>{r}</Text>
-                        </PressableScale>
-                      ))}
+                      {CANCEL_REASON_KEYS.map((key) => {
+                        const label = t(key);
+                        return (
+                          <PressableScale
+                            key={key}
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: reason === label }}
+                            style={[styles.reason, reason === label && styles.reasonSelected]}
+                            onPress={() => setReason(label)}
+                          >
+                            <Text style={[styles.reasonText, reason === label && styles.reasonTextSelected]}>{label}</Text>
+                          </PressableScale>
+                        );
+                      })}
                     </View>
                     {cancel.isError ? <Notice tone="error" message={describeError(cancel.error)} /> : null}
-                    <Button variant="danger" label="Cancel ride" loading={cancel.isPending} onPress={() => cancel.mutate()} />
-                    <Button variant="outline" label="Keep my ride" onPress={() => setCancelling(false)} />
+                    <Button variant="danger" label={t('trip.cancelRide')} loading={cancel.isPending} onPress={() => cancel.mutate()} />
+                    <Button variant="outline" label={t('trip.keepRide')} onPress={() => setCancelling(false)} />
                   </View>
                 ) : (
-                  <Button variant="outline" label="Cancel ride" onPress={() => setCancelling(true)} />
+                  <Button variant="outline" label={t('trip.cancelRide')} onPress={() => setCancelling(true)} />
                 )
               ) : null}
 
-              {data.ride_code ? <Text style={styles.code}>Ride {data.ride_code}</Text> : null}
+              {data.ride_code ? <Text style={styles.code}>{t('trip.rideCode', { code: data.ride_code })}</Text> : null}
             </>
           )}
         </ScrollView>
