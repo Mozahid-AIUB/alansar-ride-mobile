@@ -32,12 +32,23 @@
 - [ ] Driver registration/onboarding (গাড়ির তথ্য, লাইসেন্স ইত্যাদি — backend কী চায় দেখতে হবে)
 
 ### গ) মূল driver স্ক্রিন
-- [ ] **Online/Offline toggle** — driver অনলাইন হলে রাইড রিকোয়েস্ট পাবে
-- [ ] **Incoming ride requests** — নতুন রাইড এলে দেখানো (socket দিয়ে realtime)
-- [ ] **Fare offer dialog** — customer-এর "নিজের ভাড়া"-র জবাবে driver accept/counter করবে (FLUTTER_TO_RN_MAP-এ `driver/fare_offer_dialog` আছে)
+- [x] **Online/Offline toggle** — আসল API (`PUT /drivers/:id/status`) ✅
+- [x] **Incoming ride requests** — online হলে `GET /rides/available` polling ✅
+- [x] **Fare offer** — accept বা "আমার দাম বলি" (`POST /rides/:id/offers`) ✅
+- [x] **Earnings** — আজকের trips/আয় (`GET /drivers/:id/earnings`) ✅
+- [x] **Driver account** — profile, ভাষা, logout ✅
 - [ ] **Active trip স্ক্রিন** — pickup-এ যাওয়া, arrived, started, completed; map + navigation
-- [ ] **Earnings/history** — আয়ের হিসাব
-- [ ] **Driver profile + account**
+- [ ] **Realtime (socket)** — এখন polling; `@alansar/realtime` প্যাকেজ খালি, Socket.io client বানাতে হবে
+- [ ] **Chat** (ride fix হওয়ার পরে driver↔rider) — backend-এ `messages/` আছে, endpoint দেখতে হবে
+
+### ঙ) Uber-মতো realistic ভাড়া (traffic-ভিত্তিক) — পরে
+এখন ভাড়া = `base + per_km × দূরত্ব` (শুধু দূরত্ব, সময়/traffic নেই)।
+Uber-মতো করতে backend `pricing.service.js`-এ:
+- [ ] `per_minute` rate যোগ (DB `vehicle_pricing` + `app_settings`)
+- [ ] formula: `base + per_km×km + per_min×minutes`
+- [ ] minutes আসবে Google Routes API-র traffic-সহ `durationSeconds` থেকে (Routes API enabled)
+- [ ] admin panel-এ per-minute rate সেটিং যোগ
+- [ ] (ঐচ্ছিক) surge multiplier — চাহিদা বেশি হলে ভাড়া বাড়া
 
 ### ঘ) Backend endpoints যা লাগবে (নিশ্চিত করতে হবে)
 - Driver-এর online/offline, location update (socket), ride accept/offer, trip status update

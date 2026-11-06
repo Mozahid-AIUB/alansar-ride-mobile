@@ -274,6 +274,21 @@ export const en = {
   'request.offerSent': 'Offer sent. Waiting for the rider.',
   'request.offerFailed': "Couldn't send the offer. Try again.",
 
+  // Driver — active trip
+  'dtrip.toPickup': 'Head to pickup',
+  'dtrip.toPickupBody': 'Pick up {name} at {place}.',
+  'dtrip.arrived': "I've arrived",
+  'dtrip.onTrip': 'On the trip',
+  'dtrip.onTripBody': 'Driving {name} to {place}.',
+  'dtrip.start': 'Start trip',
+  'dtrip.complete': 'Complete trip',
+  'dtrip.rider': 'Rider',
+  'dtrip.fare': 'Fare',
+  'dtrip.pickup': 'Pickup',
+  'dtrip.dropoff': 'Destination',
+  'dtrip.call': 'Call rider',
+  'dtrip.actionFailed': "Couldn't update the trip. Try again.",
+
   // Legal
   'legal.terms.title': 'Terms of Service',
   'legal.privacy.title': 'Privacy Policy',
@@ -619,6 +634,21 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'request.cancel': 'বাতিল',
   'request.offerSent': 'প্রস্তাব পাঠানো হয়েছে। যাত্রীর অপেক্ষায়।',
   'request.offerFailed': 'প্রস্তাব পাঠানো যায়নি। আবার চেষ্টা করুন।',
+
+  // Driver — active trip
+  'dtrip.toPickup': 'যাত্রীর কাছে যান',
+  'dtrip.toPickupBody': '{place} থেকে {name} কে তুলুন।',
+  'dtrip.arrived': 'আমি পৌঁছেছি',
+  'dtrip.onTrip': 'যাত্রা চলছে',
+  'dtrip.onTripBody': '{name} কে {place} এ নিয়ে যাচ্ছেন।',
+  'dtrip.start': 'যাত্রা শুরু',
+  'dtrip.complete': 'যাত্রা শেষ',
+  'dtrip.rider': 'যাত্রী',
+  'dtrip.fare': 'ভাড়া',
+  'dtrip.pickup': 'যাত্রা শুরু',
+  'dtrip.dropoff': 'গন্তব্য',
+  'dtrip.call': 'যাত্রীকে কল করুন',
+  'dtrip.actionFailed': 'যাত্রা হালনাগাদ করা যায়নি। আবার চেষ্টা করুন।',
 
   // Legal
   'legal.terms.title': 'সেবার শর্তাবলী',

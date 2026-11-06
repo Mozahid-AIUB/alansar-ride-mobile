@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { driversApi } from '@alansar/api';
+import { driversApi, ridesApi } from '@alansar/api';
 import { session } from '@alansar/auth';
 
 const driverId = () => {
@@ -30,4 +30,12 @@ export const useAvailableRides = (enabled: boolean) =>
     queryFn: driversApi.availableRides,
     enabled,
     refetchInterval: enabled ? 5_000 : false,
+  });
+
+/** The driver's current assigned trip, if any; polled while it runs. */
+export const useActiveTrip = () =>
+  useQuery({
+    queryKey: ['driver', 'active-trip'],
+    queryFn: ridesApi.active,
+    refetchInterval: 5_000,
   });

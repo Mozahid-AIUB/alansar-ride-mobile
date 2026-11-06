@@ -126,6 +126,10 @@ export type RideDetail = Ride & {
   vehicle_seats: number | null;
   driver_lat: Numeric;
   driver_lng: Numeric;
+  // The rider, as the driver's side of a ride sees them.
+  customer_name?: string | null;
+  customer_phone?: string | null;
+  customer_avatar?: string | null;
 };
 
 /** A driver's counter-offer on a ride (offer.service.js OFFER_COLUMNS). */

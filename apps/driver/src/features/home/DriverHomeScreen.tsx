@@ -11,7 +11,8 @@ import { formatTaka } from '@alansar/utils';
 
 import { PressableScale } from '@/components/PressableScale';
 import { RideRequestCard } from '@/features/requests/RideRequestCard';
-import { useAvailableRides, useDriverEarnings } from '@/hooks/queries';
+import { DriverTripScreen } from '@/features/trip/DriverTripScreen';
+import { useActiveTrip, useAvailableRides, useDriverEarnings } from '@/hooks/queries';
 import { useSession } from '@/hooks/useSession';
 import { driverStatus, useDriverOnline } from '@/store/driverStatus';
 
@@ -26,6 +27,11 @@ export function DriverHomeScreen() {
   const [busy, setBusy] = useState(false);
   const earnings = useDriverEarnings();
   const requests = useAvailableRides(online);
+  const activeTrip = useActiveTrip();
+
+  // An assigned, in-progress trip takes over the whole screen.
+  const trip = activeTrip.data;
+  const onTrip = !!trip && (trip.status === 'accepted' || trip.status === 'started');
 
   const name = state.status === 'signedIn' ? (state.user.full_name?.split(' ')[0] ?? 'driver') : 'driver';
   const todayRides = Number(earnings.data?.today_rides ?? 0);
@@ -37,6 +43,9 @@ export function DriverHomeScreen() {
     await driverStatus.toggle();
     setBusy(false);
   };
+
+  // While on an assigned trip, that screen replaces home.
+  if (onTrip && trip) return <DriverTripScreen ride={trip} />;
 
   return (
     <View style={styles.root}>
