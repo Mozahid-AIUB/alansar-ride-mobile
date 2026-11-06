@@ -5,6 +5,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { Notice } from '@/components/Notice';
@@ -24,6 +25,7 @@ const enter = (delay: number) => FadeInDown.delay(delay).duration(420);
 export function ServicesScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const t = useT();
   const vehicles = useVehicleAvailability();
 
   const tileWidth = (width - spacing.lg * 2 - GAP) / 2;
@@ -36,11 +38,11 @@ export function ServicesScreen() {
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.md }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Services</Text>
-        <Text style={styles.subtitle}>Go anywhere, the way you like.</Text>
+        <Text style={styles.title}>{t('services.title')}</Text>
+        <Text style={styles.subtitle}>{t('services.subtitle')}</Text>
 
         <Animated.View entering={enter(0)}>
-          <Text style={styles.section}>Rides</Text>
+          <Text style={styles.section}>{t('services.rides')}</Text>
           {vehicles.isError ? (
             <Notice tone="error" message={describeError(vehicles.error)} />
           ) : (
@@ -63,7 +65,7 @@ export function ServicesScreen() {
         </Animated.View>
 
         <Animated.View entering={enter(80)}>
-          <Text style={styles.section}>Plan ahead</Text>
+          <Text style={styles.section}>{t('services.planAhead')}</Text>
           <PressableScale
             accessibilityRole="button"
             style={styles.schedule}
@@ -73,10 +75,8 @@ export function ServicesScreen() {
               <CalendarBlank size={26} color={colors.brand} weight="duotone" />
             </View>
             <View style={styles.scheduleText}>
-              <Text style={styles.scheduleTitle}>Schedule a ride</Text>
-              <Text style={styles.scheduleBody}>
-                Book for later. We find your driver ahead of time.
-              </Text>
+              <Text style={styles.scheduleTitle}>{t('services.schedule')}</Text>
+              <Text style={styles.scheduleBody}>{t('services.scheduleBody')}</Text>
             </View>
             <CaretRight size={18} color={colors.textSubtle} weight="bold" />
           </PressableScale>

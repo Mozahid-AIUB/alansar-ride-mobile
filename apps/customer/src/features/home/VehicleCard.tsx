@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { User } from 'phosphor-react-native';
 
 import { assetUrl, type VehicleType } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { VehicleArt } from '@/components/illustrations/VehicleArt';
@@ -22,13 +23,15 @@ type Props = {
 };
 
 export function VehicleCard({ vehicle, onPress, style, artWidth = 84 }: Props) {
+  const t = useT();
   const image = assetUrl(vehicle.image_url);
   const online = vehicle.online_count > 0;
+  const nearby = t('services.nearby', { count: vehicle.online_count });
 
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityLabel={`${vehicle.name}, ${online ? `${vehicle.online_count} nearby` : 'no drivers online'}`}
+      accessibilityLabel={`${vehicle.name}, ${online ? nearby : t('services.offline')}`}
       style={[styles.card, style]}
       onPress={onPress}
     >
@@ -51,7 +54,7 @@ export function VehicleCard({ vehicle, onPress, style, artWidth = 84 }: Props) {
         ) : null}
         <View style={[styles.dot, online ? styles.dotOn : styles.dotOff]} />
         <Text style={[styles.meta, online && styles.metaOn]} numberOfLines={1}>
-          {online ? `${vehicle.online_count} nearby` : 'Offline'}
+          {online ? nearby : t('services.offline')}
         </Text>
       </View>
     </PressableScale>

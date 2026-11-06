@@ -7,6 +7,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError } from '@alansar/api';
+import { useT, type TranslationKey } from '@alansar/i18n';
 import { gradients, lightTheme, onHero } from '@alansar/theme';
 import { initialsOf } from '@alansar/utils';
 
@@ -35,23 +36,24 @@ const { colors, spacing, radius, typography, shadows, controls } = lightTheme;
 
 const enter = (delay: number) => FadeInDown.delay(delay).duration(460);
 
-const greeting = () => {
+const greetingKey = (): TranslationKey => {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'home.greeting.morning';
+  if (hour < 17) return 'home.greeting.afternoon';
+  return 'home.greeting.evening';
 };
 
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const state = useSession();
+  const t = useT();
   const vehicles = useVehicleAvailability();
   const history = useRideHistory(3);
   const unread = useUnreadCount().data ?? 0;
   const active = useActiveRide().data;
 
   if (state.status !== 'signedIn') return null;
-  const name = state.user.full_name?.trim() || 'there';
+  const name = state.user.full_name?.trim() || t('home.greetingFallback');
   const onlineTotal = (vehicles.data ?? []).reduce((sum, v) => sum + v.online_count, 0);
   const rides = history.data?.items ?? [];
 
@@ -70,7 +72,7 @@ export function HomeScreen() {
               <Text style={styles.avatarText}>{initialsOf(name) || 'A'}</Text>
             </View>
             <View style={styles.hello}>
-              <Text style={styles.helloSmall}>{greeting()},</Text>
+              <Text style={styles.helloSmall}>{t(greetingKey())}</Text>
               <Text style={styles.helloName} numberOfLines={1}>
                 {name.split(' ')[0]}
               </Text>
@@ -92,15 +94,17 @@ export function HomeScreen() {
           </View>
 
           <Animated.Text entering={enter(0)} style={styles.heroTitle}>
-            Where are you{'\n'}going today?
+            {t('home.whereTo')}
           </Animated.Text>
           {vehicles.data ? (
             <Animated.View entering={enter(60)} style={styles.livePill}>
               <View style={styles.liveDot} />
               <Text style={styles.liveText}>
                 {onlineTotal > 0
-                  ? `${onlineTotal} driver${onlineTotal === 1 ? '' : 's'} online near you`
-                  : 'No drivers online right now'}
+                  ? onlineTotal === 1
+                    ? t('home.oneDriverOnline')
+                    : t('home.driversOnline', { count: onlineTotal })
+                  : t('home.noDrivers')}
               </Text>
             </Animated.View>
           ) : null}
@@ -111,17 +115,17 @@ export function HomeScreen() {
           <Animated.View entering={enter(100)}>
             <PressableScale
               accessibilityRole="button"
-              accessibilityLabel="Where to?"
+              accessibilityLabel={t('home.searchPlaceholder')}
               style={styles.search}
               onPress={() => startBooking()}
             >
               <View style={styles.searchIcon}>
                 <MagnifyingGlass size={20} color={colors.onPrimary} weight="bold" />
               </View>
-              <Text style={styles.searchText}>Where to?</Text>
+              <Text style={styles.searchText}>{t('home.searchPlaceholder')}</Text>
               <View style={styles.nowChip}>
                 <Clock size={15} color={colors.text} weight="bold" />
-                <Text style={styles.nowText}>Now</Text>
+                <Text style={styles.nowText}>{t('home.now')}</Text>
               </View>
             </PressableScale>
           </Animated.View>
@@ -132,8 +136,8 @@ export function HomeScreen() {
 
           <Animated.View entering={enter(160)}>
             <SectionTitle
-              title="Suggestions"
-              action={{ label: 'See all', onPress: () => router.navigate('/services') }}
+              title={t('home.suggestions')}
+              action={{ label: t('home.seeAll'), onPress: () => router.navigate('/services') }}
             />
             {vehicles.isError ? (
               <Notice tone="error" message={describeError(vehicles.error)} />
@@ -152,8 +156,8 @@ export function HomeScreen() {
 
           <Animated.View entering={enter(340)}>
             <SectionTitle
-              title="Recent rides"
-              action={rides.length ? { label: 'See all', onPress: () => router.navigate('/activity') } : undefined}
+              title={t('home.recentRides')}
+              action={rides.length ? { label: t('home.seeAll'), onPress: () => router.navigate('/activity') } : undefined}
             />
             <View style={styles.card}>
               {history.isError ? (
@@ -171,16 +175,16 @@ export function HomeScreen() {
                   </PressableScale>
                 ))
               ) : history.isPending ? (
-                <Text style={styles.muted}>Loading your rides…</Text>
+                <Text style={styles.muted}>{t('home.loadingRides')}</Text>
               ) : (
                 <View style={styles.empty}>
                   <View style={styles.emptyArt}>
                     <VehicleArt slug="car" width={96} />
                   </View>
-                  <Text style={styles.emptyTitle}>Your first ride is a tap away</Text>
-                  <Text style={styles.emptyBody}>Trips you take will show up here.</Text>
+                  <Text style={styles.emptyTitle}>{t('home.firstRide')}</Text>
+                  <Text style={styles.emptyBody}>{t('home.ridesShowHere')}</Text>
                   <View style={styles.emptyAction}>
-                    <Button label="Book a ride" onPress={() => startBooking()} />
+                    <Button label={t('home.bookRide')} onPress={() => startBooking()} />
                   </View>
                 </View>
               )}

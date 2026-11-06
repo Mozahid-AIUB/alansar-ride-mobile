@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
@@ -19,17 +20,21 @@ const { colors, spacing, radius, typography, shadows } = lightTheme;
 /** Every trip, newest first, from GET /api/rides/history. */
 export function ActivityScreen() {
   const insets = useSafeAreaInsets();
+  const t = useT();
   const history = useRideHistory(20);
   const rides = history.data?.items ?? [];
+  const total = history.data?.pagination.total;
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + spacing.md }]}>
       <StatusBar style="dark" />
-      <Text style={styles.title}>Activity</Text>
+      <Text style={styles.title}>{t('activity.title')}</Text>
       <Text style={styles.subtitle}>
-        {history.data
-          ? `${history.data.pagination.total} ride${history.data.pagination.total === 1 ? '' : 's'}`
-          : 'Your trips'}
+        {total === undefined
+          ? t('activity.yourTrips')
+          : total === 1
+            ? t('activity.oneRide')
+            : t('activity.rideCount', { count: total })}
       </Text>
 
       {history.isError ? (
@@ -60,18 +65,16 @@ export function ActivityScreen() {
           }
           ListEmptyComponent={
             history.isPending ? (
-              <Text style={styles.muted}>Loading your rides…</Text>
+              <Text style={styles.muted}>{t('activity.loading')}</Text>
             ) : (
               <View style={styles.empty}>
                 <View style={styles.emptyArt}>
                   <VehicleArt slug="auto" width={110} />
                 </View>
-                <Text style={styles.emptyTitle}>No rides yet</Text>
-                <Text style={styles.emptyBody}>
-                  When you take a trip, its route, fare and receipt live here.
-                </Text>
+                <Text style={styles.emptyTitle}>{t('activity.empty')}</Text>
+                <Text style={styles.emptyBody}>{t('activity.emptyBody')}</Text>
                 <View style={styles.emptyAction}>
-                  <Button label="Book a ride" onPress={() => startBooking()} />
+                  <Button label={t('activity.bookRide')} onPress={() => startBooking()} />
                 </View>
               </View>
             )
