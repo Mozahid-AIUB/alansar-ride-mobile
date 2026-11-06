@@ -44,6 +44,47 @@ export const en = {
   'home.fareKicker': 'ONLY ON AL ANSAR',
   'home.fareTitle': 'Name your own fare',
   'home.fareBody': 'Offer a price. Drivers accept or counter, and you ride only at a fare you agreed.',
+  'home.scheduleTile': 'Schedule',
+
+  // Active ride banner
+  'banner.scheduled': 'Scheduled · {when}',
+  'banner.finding': 'Finding your driver…',
+  'banner.driverHere': 'Your driver is here',
+  'banner.onWay': 'Driver on the way',
+  'banner.started': 'On your way',
+  'banner.yourRide': 'Your ride',
+  'banner.to': 'To {dest}',
+  'banner.destination': 'your destination',
+
+  // Vehicle option (Choose a ride row)
+  'vehicle.noDrivers': 'No drivers online',
+  'vehicle.nearbyTrip': '{count} nearby',
+  'vehicle.minTrip': ' · {min} min trip',
+
+  // Offers (drivers' counter prices)
+  'offers.title': "Drivers' offers",
+  'offers.driver': 'Driver',
+  'offers.decline': 'Decline',
+  'offers.accept': 'Accept',
+
+  // Rating
+  'rating.title': 'How was your ride with {name}?',
+  'rating.tapStar': 'Tap a star',
+  'rating.poor': 'Poor',
+  'rating.couldBeBetter': 'Could be better',
+  'rating.okay': 'Okay',
+  'rating.good': 'Good',
+  'rating.excellent': 'Excellent',
+  'rating.comment': 'Add a comment (optional)',
+  'rating.submit': 'Submit rating',
+  'rating.skip': 'Skip',
+
+  // Notifications
+  'notifications.title': 'Notifications',
+  'notifications.markAll': 'Mark all read',
+  'notifications.loading': 'Loading…',
+  'notifications.empty': "You're all caught up",
+  'notifications.emptyBody': 'Ride updates, receipts and news from Al Ansar will show up here.',
 
   // Services
   'services.title': 'Services',
@@ -312,6 +353,47 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'home.fareKicker': 'শুধুমাত্র আল আনসারে',
   'home.fareTitle': 'নিজের ভাড়া বলুন',
   'home.fareBody': 'দাম প্রস্তাব করুন। চালক মানবে বা পাল্টা দাম দেবে, আপনি যে ভাড়ায় রাজি শুধু সেই ভাড়াতেই যাবেন।',
+  'home.scheduleTile': 'নির্ধারণ',
+
+  // Active ride banner
+  'banner.scheduled': 'নির্ধারিত · {when}',
+  'banner.finding': 'আপনার চালক খোঁজা হচ্ছে…',
+  'banner.driverHere': 'আপনার চালক এসে গেছেন',
+  'banner.onWay': 'চালক আসছেন',
+  'banner.started': 'আপনি রওনা হয়েছেন',
+  'banner.yourRide': 'আপনার যাত্রা',
+  'banner.to': '{dest} এর দিকে',
+  'banner.destination': 'আপনার গন্তব্য',
+
+  // Vehicle option (Choose a ride row)
+  'vehicle.noDrivers': 'কোনো চালক অনলাইনে নেই',
+  'vehicle.nearbyTrip': '{count} জন কাছে',
+  'vehicle.minTrip': ' · {min} মিনিট যাত্রা',
+
+  // Offers (drivers' counter prices)
+  'offers.title': 'চালকদের প্রস্তাব',
+  'offers.driver': 'চালক',
+  'offers.decline': 'প্রত্যাখ্যান',
+  'offers.accept': 'গ্রহণ',
+
+  // Rating
+  'rating.title': '{name} এর সাথে আপনার যাত্রা কেমন ছিল?',
+  'rating.tapStar': 'একটি তারা চাপুন',
+  'rating.poor': 'খারাপ',
+  'rating.couldBeBetter': 'আরও ভালো হতে পারত',
+  'rating.okay': 'মোটামুটি',
+  'rating.good': 'ভালো',
+  'rating.excellent': 'চমৎকার',
+  'rating.comment': 'একটি মন্তব্য যোগ করুন (ঐচ্ছিক)',
+  'rating.submit': 'রেটিং জমা দিন',
+  'rating.skip': 'এড়িয়ে যান',
+
+  // Notifications
+  'notifications.title': 'বিজ্ঞপ্তি',
+  'notifications.markAll': 'সব পঠিত করুন',
+  'notifications.loading': 'লোড হচ্ছে…',
+  'notifications.empty': 'আপনি সব দেখে ফেলেছেন',
+  'notifications.emptyBody': 'যাত্রার আপডেট, রসিদ ও আল আনসারের খবর এখানে দেখা যাবে।',
 
   // Services
   'services.title': 'সেবা',

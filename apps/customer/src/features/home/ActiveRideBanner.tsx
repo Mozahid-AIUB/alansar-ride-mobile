@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { CaretRight, NavigationArrow } from 'phosphor-react-native';
 
 import type { RideDetail } from '@alansar/api';
+import { useT, type TranslationKey } from '@alansar/i18n';
 import { lightTheme, onHero } from '@alansar/theme';
 import { formatRideDate } from '@alansar/utils';
 
@@ -10,18 +11,21 @@ import { PressableScale } from '@/components/PressableScale';
 
 const { colors, spacing, radius, typography, shadows } = lightTheme;
 
-const describe = (ride: RideDetail) => {
+type Translate = (key: TranslationKey, vars?: Record<string, string | number>) => string;
+
+const describe = (ride: RideDetail, t: Translate) => {
   if (ride.status === 'requested' && ride.scheduled_for && !ride.dispatched_at) {
-    return `Scheduled · ${formatRideDate(ride.scheduled_for)}`;
+    return t('banner.scheduled', { when: formatRideDate(ride.scheduled_for) });
   }
-  if (ride.status === 'requested') return 'Finding your driver…';
-  if (ride.status === 'accepted') return ride.arrived_at ? 'Your driver is here' : 'Driver on the way';
-  if (ride.status === 'started') return 'On your way';
-  return 'Your ride';
+  if (ride.status === 'requested') return t('banner.finding');
+  if (ride.status === 'accepted') return ride.arrived_at ? t('banner.driverHere') : t('banner.onWay');
+  if (ride.status === 'started') return t('banner.started');
+  return t('banner.yourRide');
 };
 
 /** Back into a ride that is still going, from anywhere on Home. */
 export function ActiveRideBanner({ ride }: { ride: RideDetail }) {
+  const t = useT();
   return (
     <PressableScale
       accessibilityRole="button"
@@ -32,9 +36,9 @@ export function ActiveRideBanner({ ride }: { ride: RideDetail }) {
         <NavigationArrow size={20} color={colors.onPrimary} weight="fill" />
       </View>
       <View style={styles.text}>
-        <Text style={styles.title}>{describe(ride)}</Text>
+        <Text style={styles.title}>{describe(ride, t)}</Text>
         <Text style={styles.body} numberOfLines={1}>
-          To {ride.dropoff_name ?? ride.dropoff_address ?? 'your destination'}
+          {t('banner.to', { dest: ride.dropoff_name ?? ride.dropoff_address ?? t('banner.destination') })}
         </Text>
       </View>
       <CaretRight size={18} color={onHero.text} weight="bold" />

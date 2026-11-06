@@ -13,6 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { describeError, type AppNotification } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { formatTimeAgo } from '@alansar/utils';
 
@@ -34,6 +35,7 @@ const iconFor = (type: string | null): ComponentType<IconProps> => {
 
 export function NotificationsScreen() {
   const insets = useSafeAreaInsets();
+  const t = useT();
   const list = useNotifications();
   const unread = useUnreadCount();
   const markRead = useMarkRead();
@@ -53,11 +55,11 @@ export function NotificationsScreen() {
             disabled={markAllRead.isPending}
             onPress={() => markAllRead.mutate(undefined)}
           >
-            <Text style={styles.markAllText}>Mark all read</Text>
+            <Text style={styles.markAllText}>{t('notifications.markAll')}</Text>
           </PressableScale>
         ) : null}
       </View>
-      <Text style={styles.title}>Notifications</Text>
+      <Text style={styles.title}>{t('notifications.title')}</Text>
 
       {list.isError ? (
         <View style={styles.pad}>
@@ -86,16 +88,14 @@ export function NotificationsScreen() {
           }
           ListEmptyComponent={
             list.isPending ? (
-              <Text style={styles.muted}>Loading…</Text>
+              <Text style={styles.muted}>{t('notifications.loading')}</Text>
             ) : (
               <View style={styles.empty}>
                 <View style={styles.emptyIcon}>
                   <Bell size={40} color={colors.brand} weight="duotone" />
                 </View>
-                <Text style={styles.emptyTitle}>You're all caught up</Text>
-                <Text style={styles.emptyBody}>
-                  Ride updates, receipts and news from Al Ansar will show up here.
-                </Text>
+                <Text style={styles.emptyTitle}>{t('notifications.empty')}</Text>
+                <Text style={styles.emptyBody}>{t('notifications.emptyBody')}</Text>
               </View>
             )
           }

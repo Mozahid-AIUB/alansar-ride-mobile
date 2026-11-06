@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CalendarBlank } from 'phosphor-react-native';
 
 import type { VehicleType } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { VehicleArt } from '@/components/illustrations/VehicleArt';
@@ -20,6 +21,7 @@ export function Suggestions({
   onPick: (vehicle: VehicleType) => void;
   onSchedule: () => void;
 }) {
+  const t = useT();
   return (
     <View style={styles.row}>
       {vehicles
@@ -50,7 +52,7 @@ export function Suggestions({
         <View style={styles.art}>
           <CalendarBlank size={28} color={colors.brand} weight="duotone" />
         </View>
-        <Text style={styles.label}>Schedule</Text>
+        <Text style={styles.label}>{t('home.scheduleTile')}</Text>
       </PressableScale>
     </View>
   );

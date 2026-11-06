@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Star } from 'phosphor-react-native';
 
 import { describeError, ridesApi } from '@alansar/api';
+import { useT, type TranslationKey } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 
 import { Button } from '@/components/Button';
@@ -13,10 +14,11 @@ import { TextField } from '@/components/TextField';
 
 const { colors, spacing, typography } = lightTheme;
 
-const LABELS = ['', 'Poor', 'Could be better', 'Okay', 'Good', 'Excellent'];
+const LABEL_KEYS: (TranslationKey | '')[] = ['', 'rating.poor', 'rating.couldBeBetter', 'rating.okay', 'rating.good', 'rating.excellent'];
 
 /** Five stars and an optional comment for the driver, after a completed trip. */
 export function RatingPanel({ rideId, driverName, onDone }: { rideId: string; driverName: string; onDone: () => void }) {
+  const t = useT();
   const [stars, setStars] = useState(0);
   const [review, setReview] = useState('');
   const rate = useMutation({
@@ -26,7 +28,7 @@ export function RatingPanel({ rideId, driverName, onDone }: { rideId: string; dr
 
   return (
     <View style={styles.root}>
-      <Text style={styles.title}>How was your ride with {driverName}?</Text>
+      <Text style={styles.title}>{t('rating.title', { name: driverName })}</Text>
       <View style={styles.stars}>
         {[1, 2, 3, 4, 5].map((n) => (
           <PressableScale key={n} accessibilityRole="button" accessibilityLabel={`${n} star${n > 1 ? 's' : ''}`} hitSlop={4} onPress={() => setStars(n)}>
@@ -34,13 +36,13 @@ export function RatingPanel({ rideId, driverName, onDone }: { rideId: string; dr
           </PressableScale>
         ))}
       </View>
-      <Text style={styles.label}>{LABELS[stars] || 'Tap a star'}</Text>
+      <Text style={styles.label}>{LABEL_KEYS[stars] ? t(LABEL_KEYS[stars] as TranslationKey) : t('rating.tapStar')}</Text>
       {stars ? (
-        <TextField label="Add a comment (optional)" value={review} onChangeText={setReview} maxLength={1000} returnKeyType="done" />
+        <TextField label={t('rating.comment')} value={review} onChangeText={setReview} maxLength={1000} returnKeyType="done" />
       ) : null}
       {rate.isError ? <Notice tone="error" message={describeError(rate.error)} /> : null}
-      <Button label="Submit rating" disabled={!stars} loading={rate.isPending} onPress={() => rate.mutate()} />
-      <Button variant="outline" label="Skip" onPress={onDone} />
+      <Button label={t('rating.submit')} disabled={!stars} loading={rate.isPending} onPress={() => rate.mutate()} />
+      <Button variant="outline" label={t('rating.skip')} onPress={onDone} />
     </View>
   );
 }

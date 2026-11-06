@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { User } from 'phosphor-react-native';
 
 import type { FareEstimate, VehicleType } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { formatTaka } from '@alansar/utils';
 
@@ -21,6 +22,7 @@ type Props = {
 
 /** One row of "Choose a ride": the vehicle, live availability and its quoted fare. */
 export function VehicleOption({ vehicle, estimate, loading, selected, onPress }: Props) {
+  const t = useT();
   const online = vehicle.online_count > 0;
   const minutes = estimate?.durationMinutes;
 
@@ -45,8 +47,8 @@ export function VehicleOption({ vehicle, estimate, loading, selected, onPress }:
           ) : null}
         </View>
         <Text style={[styles.meta, online && styles.metaOn]}>
-          {online ? `${vehicle.online_count} nearby` : 'No drivers online'}
-          {minutes ? ` · ${minutes} min trip` : ''}
+          {online ? t('vehicle.nearbyTrip', { count: vehicle.online_count }) : t('vehicle.noDrivers')}
+          {minutes ? t('vehicle.minTrip', { min: minutes }) : ''}
         </Text>
       </View>
       {loading ? (

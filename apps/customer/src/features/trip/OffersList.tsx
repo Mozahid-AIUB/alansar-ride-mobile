@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Star } from 'phosphor-react-native';
 
 import type { FareOffer } from '@alansar/api';
+import { useT } from '@alansar/i18n';
 import { lightTheme } from '@alansar/theme';
 import { formatTaka, initialsOf } from '@alansar/utils';
 
@@ -18,11 +19,12 @@ type Props = {
 
 /** Drivers' counter-prices, cheapest first. Accepting one assigns that driver. */
 export function OffersList({ offers, busyId, onAccept, onDecline }: Props) {
+  const t = useT();
   if (!offers.length) return null;
 
   return (
     <View style={styles.root}>
-      <Text style={styles.title}>Drivers' offers</Text>
+      <Text style={styles.title}>{t('offers.title')}</Text>
       {offers.map((offer) => {
         const rating = offer.driver_rating ? Number(offer.driver_rating) : null;
         const busy = busyId === offer.id;
@@ -34,7 +36,7 @@ export function OffersList({ offers, busyId, onAccept, onDecline }: Props) {
               </View>
               <View style={styles.body}>
                 <Text style={styles.name} numberOfLines={1}>
-                  {offer.driver_name ?? 'Driver'}
+                  {offer.driver_name ?? t('offers.driver')}
                 </Text>
                 <View style={styles.metaRow}>
                   {rating ? (
@@ -53,10 +55,10 @@ export function OffersList({ offers, busyId, onAccept, onDecline }: Props) {
             {offer.note ? <Text style={styles.note}>“{offer.note}”</Text> : null}
             <View style={styles.actions}>
               <View style={styles.action}>
-                <Button size="sm" variant="outline" label="Decline" disabled={!!busyId} onPress={() => onDecline(offer)} />
+                <Button size="sm" variant="outline" label={t('offers.decline')} disabled={!!busyId} onPress={() => onDecline(offer)} />
               </View>
               <View style={styles.action}>
-                <Button size="sm" label="Accept" loading={busy} disabled={!!busyId && !busy} onPress={() => onAccept(offer)} />
+                <Button size="sm" label={t('offers.accept')} loading={busy} disabled={!!busyId && !busy} onPress={() => onAccept(offer)} />
               </View>
             </View>
           </View>
