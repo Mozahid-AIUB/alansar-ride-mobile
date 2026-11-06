@@ -7,9 +7,10 @@ import { lightTheme, palette } from '@alansar/theme';
 import type { Coord } from '@/store/booking';
 import { useMapProvider } from '@/store/mapPrefs';
 
+import { AnimatedDriverMarker } from './AnimatedDriverMarker';
 import { DEFAULT_CENTER, OPEN_TILES } from './mapConfig';
 import { CLEAN_MAP_STYLE } from './mapStyle';
-import { DriverPin, DropoffPin, PickupPin } from './Pins';
+import { DropoffPin, PickupPin } from './Pins';
 
 const { spacing, typography, colors } = lightTheme;
 
@@ -39,6 +40,11 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
   const map = useRef<MapView>(null);
   const line = route?.length ? route : pickup && dropoff ? [pickup, dropoff] : null;
 
+  // A tilted 3D view, but only on the live Google map — flat for static card
+  // previews (clarity) and for the raster Mapbox tiles (no 3D buildings there).
+  const tilted = interactive && !free && Platform.OS !== 'web';
+  const PITCH = 55;
+
   const framing = [pickup, dropoff, driver, ...(route ?? [])].filter((c): c is Coord => !!c);
   const framingKey = framing.map((c) => `${c.latitude.toFixed(4)},${c.longitude.toFixed(4)}`).join('|');
 
@@ -47,16 +53,25 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
     // One point (e.g. just the passenger): centre on it at street level instead of max zoom.
     const only = framing.length === 1 ? framing[0] : undefined;
     if (only) {
-      map.current?.animateToRegion({ ...only, latitudeDelta: 0.012, longitudeDelta: 0.012 }, 400);
+      if (tilted) {
+        map.current?.animateCamera({ center: only, pitch: PITCH, zoom: 16.5 }, { duration: 500 });
+      } else {
+        map.current?.animateToRegion({ ...only, latitudeDelta: 0.012, longitudeDelta: 0.012 }, 400);
+      }
       return;
     }
     map.current?.fitToCoordinates(framing, {
       edgePadding: { top: 120, right: 60, bottom: bottomInset + 40, left: 60 },
       animated: true,
     });
+    // Re-apply the tilt after fitToCoordinates, which frames the points flat.
+    if (tilted) {
+      const t = setTimeout(() => map.current?.animateCamera({ pitch: PITCH }, { duration: 500 }), 450);
+      return () => clearTimeout(t);
+    }
     // framingKey stands in for the coordinate list.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [framingKey, bottomInset]);
+  }, [framingKey, bottomInset, tilted]);
 
   return (
     <View style={StyleSheet.absoluteFill}>
@@ -74,7 +89,9 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
         showsMyLocationButton={false}
         showsCompass={false}
         toolbarEnabled={false}
-        pitchEnabled={false}
+        // 3D: draw extruded buildings and let the user tilt on the live map.
+        showsBuildings={tilted}
+        pitchEnabled={tilted}
         scrollEnabled={interactive}
         zoomEnabled={interactive}
         rotateEnabled={interactive}
@@ -106,11 +123,7 @@ export function RouteMap({ pickup, dropoff, route, driver, bottomInset = 0, inte
             <DropoffPin />
           </Marker>
         ) : null}
-        {driver ? (
-          <Marker coordinate={driver} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
-            <DriverPin />
-          </Marker>
-        ) : null}
+        {driver ? <AnimatedDriverMarker coordinate={driver} /> : null}
       </MapView>
       {free ? (
         <Text style={[styles.attribution, { bottom: bottomInset + spacing.xs }]}>{OPEN_TILES.attribution}</Text>

@@ -57,6 +57,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="notifications" />
             <Stack.Screen name="booking/search" />
+            <Stack.Screen name="booking/pick" />
             <Stack.Screen name="booking/review" />
             <Stack.Screen name="trip/[id]" />
           </Stack.Protected>

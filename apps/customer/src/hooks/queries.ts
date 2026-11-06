@@ -8,6 +8,7 @@ import {
   type VehicleType,
 } from '@alansar/api';
 
+import { placesProvider, type PlaceHit } from '@/services/places';
 import { coordOf, toEndpoint, type Coord, type Place } from '@/store/booking';
 
 /** Vehicle types with live driver counts; refreshed while the screen is open. */
@@ -41,13 +42,56 @@ export const usePlaceSearch = (q: string) =>
     staleTime: 60_000,
   });
 
-/** Free-text addresses. The server allows ~1 call per 2s, so no retries. */
-export const useAnywhereSearch = (q: string, near: Coord | null) =>
+/** The server geocoder's rate limit: about one call per 2s. Google tolerates faster. */
+const GEOCODER_GAP_MS = 2_100;
+/** Shorter queries tried after a miss, e.g. "kuril bisswaroad" → "kuril". */
+const MAX_FALLBACKS = 2;
+
+const pause = (ms: number, signal: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms);
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    });
+  });
+
+export type AnywhereResult = { hits: PlaceHit[]; matched: string };
+
+/**
+ * Free-text address search through the active places provider. Some providers
+ * (and the server geocoder) match whole words, so a misspelt last word finds
+ * nothing; on a miss the last word is dropped and the search retried, up to
+ * MAX_FALLBACKS times. `matched` is the text that found the hits. No React-Query
+ * retries on error — the server allows ~1 call per 2s.
+ */
+export const useAnywhereSearch = (q: string, near: Coord | null): ReturnType<typeof useQuery<AnywhereResult>> =>
   useQuery({
     queryKey: ['locations', 'anywhere', q, near?.latitude, near?.longitude],
-    queryFn: () => locationsApi.searchAnywhere(q, near ?? undefined),
+    queryFn: async ({ signal }): Promise<AnywhereResult> => {
+      const words = q.split(/\s+/);
+      for (let drop = 0; ; drop++) {
+        const attempt = words.slice(0, words.length - drop).join(' ');
+        if (drop > 0) await pause(GEOCODER_GAP_MS, signal);
+        const { hits } = await placesProvider.search(attempt, near, signal);
+        const shorter = words.slice(0, words.length - drop - 1).join(' ');
+        if (hits.length || drop >= MAX_FALLBACKS || shorter.length < 3) {
+          return { hits, matched: attempt };
+        }
+      }
+    },
     enabled: q.length >= 3,
     staleTime: 5 * 60_000,
+    retry: false,
+  });
+
+/** Label for a point picked on the map; cached for good per ~1 m spot. */
+export const useReverseGeocode = (at: Coord | null) =>
+  useQuery({
+    queryKey: ['locations', 'reverse', at?.latitude, at?.longitude],
+    queryFn: () => locationsApi.reverse((at as Coord).latitude, (at as Coord).longitude),
+    enabled: !!at,
+    staleTime: Infinity,
     retry: false,
   });
 

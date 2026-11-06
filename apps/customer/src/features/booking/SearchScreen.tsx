@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   Buildings,
   MapPin,
+  MapTrifold,
   NavigationArrow,
   Star,
   X,
@@ -20,7 +21,8 @@ import { PressableScale } from '@/components/PressableScale';
 import { useAnywhereSearch, usePlaceSearch, usePopularPlaces } from '@/hooks/queries';
 import { useDebounced } from '@/hooks/useDebounced';
 import { currentPlace } from '@/services/location';
-import { booking, coordOf, fromCatalogue, fromGeo, useBooking, type Place } from '@/store/booking';
+import { placesProvider, type PlaceHit } from '@/services/places';
+import { booking, coordOf, fromCatalogue, useBooking, type Place } from '@/store/booking';
 
 const { colors, spacing, radius, typography, shadows, controls } = lightTheme;
 
@@ -31,15 +33,23 @@ export function SearchScreen() {
   const insets = useSafeAreaInsets();
   const { pickup, dropoff } = useBooking();
   const [active, setActive] = useState<Field>('dropoff');
-  const [pickupText, setPickupText] = useState(pickup?.name ?? '');
-  const [dropoffText, setDropoffText] = useState('');
+  // What the passenger has typed; null shows the chosen place's name, so a
+  // place set on the map appears here on return.
+  const [pickupDraft, setPickupDraft] = useState<string | null>(null);
+  const [dropoffDraft, setDropoffDraft] = useState<string | null>(null);
+  const pickupText = pickupDraft ?? pickup?.name ?? '';
+  const dropoffText = dropoffDraft ?? dropoff?.name ?? '';
   const [locating, setLocating] = useState(false);
   const [locateFailed, setLocateFailed] = useState(false);
+  // Key of the hit being turned into coordinates (Google resolves on tap).
+  const [resolvingKey, setResolvingKey] = useState<string | null>(null);
+  const [resolveFailed, setResolveFailed] = useState(false);
   const dropoffInput = useRef<TextInput>(null);
 
   const text = active === 'pickup' ? pickupText : dropoffText;
-  // Typing in the pickup box over its own label is not a search.
-  const query = active === 'pickup' && pickup && text === pickup.name ? '' : text.trim();
+  // A box still showing its chosen place's name is not a search.
+  const chosen = active === 'pickup' ? pickup : dropoff;
+  const query = chosen && text === chosen.name ? '' : text.trim();
   const catalogueQuery = useDebounced(query, 250);
   const anywhereQuery = useDebounced(query, 700);
 
@@ -54,7 +64,7 @@ export function SearchScreen() {
     setLocating(false);
     if (place) {
       booking.set({ pickup: place });
-      setPickupText(place.name);
+      setPickupDraft(null);
       setActive('dropoff');
       dropoffInput.current?.focus();
     } else {
@@ -70,14 +80,14 @@ export function SearchScreen() {
   const choose = (place: Place) => {
     if (active === 'pickup') {
       booking.set({ pickup: place });
-      setPickupText(place.name);
+      setPickupDraft(null);
       setActive('dropoff');
       dropoffInput.current?.focus();
       if (booking.get().dropoff) router.push('/booking/review');
       return;
     }
     booking.set({ dropoff: place });
-    setDropoffText(place.name);
+    setDropoffDraft(null);
     if (booking.get().pickup) {
       router.push('/booking/review');
     } else {
@@ -85,13 +95,48 @@ export function SearchScreen() {
     }
   };
 
+  // A search hit may not carry coordinates yet (Google autocomplete resolves on
+  // tap). Fetch them, then pick the place.
+  const chooseHit = async (hit: PlaceHit) => {
+    setResolveFailed(false);
+    if (hit.place) {
+      choose(hit.place);
+      return;
+    }
+    setResolvingKey(hit.key);
+    try {
+      const place = await placesProvider.resolve(hit);
+      choose(place);
+    } catch {
+      setResolveFailed(true);
+    } finally {
+      setResolvingKey(null);
+    }
+  };
+
+  const pickOnMap = () => {
+    if (active === 'pickup') setPickupDraft(null);
+    else setDropoffDraft(null);
+    router.push({ pathname: '/booking/pick', params: { field: active } });
+  };
+
   const catalogueHits = query.length >= 2 ? (catalogue.data ?? []).map(fromCatalogue) : [];
   const names = new Set(catalogueHits.map((p) => p.name.toLowerCase()));
   const anywhereHits =
     query.length >= 3
-      ? (anywhere.data ?? []).map(fromGeo).filter((p) => !names.has(p.name.toLowerCase()))
+      ? (anywhere.data?.hits ?? []).filter((h) => !names.has(h.name.toLowerCase()))
       : [];
   const searching = query.length >= 2;
+  // The full text found nothing; these came from a shorter version of it.
+  const loosened = anywhereHits.length > 0 && anywhere.data && anywhere.data.matched !== query ? anywhere.data.matched : null;
+  const setOnMap = (
+    <PlaceRow
+      icon={MapTrifold}
+      title="Set location on map"
+      subtitle={active === 'pickup' ? 'Drag the map to your pickup spot' : 'Drag the map to your destination'}
+      onPress={pickOnMap}
+    />
+  );
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + spacing.sm }]}>
@@ -111,7 +156,7 @@ export function SearchScreen() {
         <View style={styles.fields}>
           <SearchInput
             value={pickupText}
-            onChangeText={setPickupText}
+            onChangeText={setPickupDraft}
             placeholder={locating ? 'Finding your location…' : 'Pickup location'}
             focused={active === 'pickup'}
             onFocus={() => setActive('pickup')}
@@ -119,7 +164,7 @@ export function SearchScreen() {
           <SearchInput
             ref={dropoffInput}
             value={dropoffText}
-            onChangeText={setDropoffText}
+            onChangeText={setDropoffDraft}
             placeholder="Where to?"
             focused={active === 'dropoff'}
             onFocus={() => setActive('dropoff')}
@@ -141,21 +186,39 @@ export function SearchScreen() {
             onPress={() => void locate()}
           />
         ) : null}
+        {!searching ? setOnMap : null}
 
         {searching ? (
           <>
             {catalogueHits.map((place) => (
               <PlaceRow key={`c-${place.locationId}`} icon={Buildings} title={place.name} subtitle={place.address} onPress={() => choose(place)} />
             ))}
-            {anywhereHits.length ? <Text style={styles.groupTitle}>More places</Text> : null}
-            {anywhereHits.map((place, i) => (
-              <PlaceRow key={`g-${i}-${place.name}`} icon={MapPin} title={place.name} subtitle={place.address} onPress={() => choose(place)} />
+            {anywhereHits.length ? (
+              <Text style={styles.groupTitle}>{loosened ? `Places matching “${loosened}”` : 'More places'}</Text>
+            ) : null}
+            {anywhereHits.map((hit) => (
+              <PlaceRow
+                key={`g-${hit.key}`}
+                icon={MapPin}
+                title={hit.name}
+                subtitle={hit.address}
+                busy={resolvingKey === hit.key}
+                onPress={() => void chooseHit(hit)}
+              />
             ))}
-            {!catalogue.isFetching && !anywhere.isFetching && !catalogueHits.length && !anywhereHits.length ? (
+            {resolveFailed ? (
+              <Text style={styles.muted}>Couldn't load that place. Try another, or set it on the map.</Text>
+            ) : null}
+            {!catalogueHits.length && !anywhereHits.length ? (
               <Text style={styles.muted}>
-                {query.length < 3 ? 'Keep typing…' : `No places match “${query}”. Try a nearby landmark.`}
+                {query.length < 3
+                  ? 'Keep typing…'
+                  : catalogue.isFetching || anywhere.isFetching
+                    ? 'Searching…'
+                    : `No places match “${query}”. Try a nearby landmark, or set it on the map.`}
               </Text>
             ) : null}
+            {setOnMap}
           </>
         ) : (
           <>
@@ -221,16 +284,18 @@ function PlaceRow({
   subtitle,
   onPress,
   tone = 'default',
+  busy = false,
 }: {
   icon: ComponentType<IconProps>;
   title: string;
   subtitle: string | null;
   onPress: () => void;
   tone?: 'default' | 'brand';
+  busy?: boolean;
 }) {
   const brand = tone === 'brand';
   return (
-    <PressableScale accessibilityRole="button" haptic={false} style={styles.row} onPress={onPress}>
+    <PressableScale accessibilityRole="button" haptic={false} style={styles.row} onPress={onPress} disabled={busy}>
       <View style={[styles.rowIcon, brand && styles.rowIconBrand]}>
         <Icon size={20} color={brand ? colors.brand : colors.textMuted} weight={brand ? 'fill' : 'regular'} />
       </View>
@@ -244,6 +309,7 @@ function PlaceRow({
           </Text>
         ) : null}
       </View>
+      {busy ? <ActivityIndicator size="small" color={colors.brand} style={styles.rowSpinner} /> : null}
     </PressableScale>
   );
 }
@@ -368,6 +434,9 @@ const styles = StyleSheet.create({
   rowSubtitle: {
     ...typography.bodySmall,
     color: colors.textMuted,
+  },
+  rowSpinner: {
+    marginLeft: spacing.sm,
   },
   muted: {
     ...typography.bodySmall,
