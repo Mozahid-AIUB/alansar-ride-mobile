@@ -245,6 +245,9 @@ export const en = {
   'driverLogin.submit': 'Sign in',
   'driverLogin.note': 'Use the account the operator registered for you.',
   'driverLogin.customerAccount': 'This is a rider account. Please use the Al Ansar Ride app.',
+  'driverLogin.or': 'or',
+  'driverLogin.google': 'Continue with Google',
+  'driverLogin.googleNotReady': "Google sign-in needs Firebase, which isn't set up on the server yet.",
 
   // Driver — home
   'driverHome.greeting': 'Hi, {name}',
@@ -576,6 +579,9 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'driverLogin.submit': 'সাইন ইন',
   'driverLogin.note': 'অপারেটর আপনার জন্য যে অ্যাকাউন্ট তৈরি করেছে তা ব্যবহার করুন।',
   'driverLogin.customerAccount': 'এটি একটি যাত্রী অ্যাকাউন্ট। অনুগ্রহ করে আল আনসার রাইড অ্যাপ ব্যবহার করুন।',
+  'driverLogin.or': 'অথবা',
+  'driverLogin.google': 'গুগল দিয়ে চালিয়ে যান',
+  'driverLogin.googleNotReady': 'গুগল সাইন-ইনের জন্য Firebase দরকার, যা এখনো সার্ভারে সেট করা হয়নি।',
 
   // Driver — home
   'driverHome.greeting': 'হ্যালো, {name}',

@@ -5,11 +5,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { authApi, describeError } from '@alansar/api';
-import { signIn } from '@alansar/auth';
+import { googleReady, signIn } from '@alansar/auth';
 import { useT } from '@alansar/i18n';
 import { fonts, gradients, lightTheme, onHero } from '@alansar/theme';
 import { isValidLoginId } from '@alansar/utils';
 
+import { GoogleLogo } from '@/components/GoogleLogo';
 import { PressableScale } from '@/components/PressableScale';
 
 const { colors, spacing, radius, typography, controls } = lightTheme;
@@ -25,6 +26,7 @@ export function DriverLoginScreen() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [googleTapped, setGoogleTapped] = useState(false);
 
   const canSubmit = isValidLoginId(loginId.trim()) && password.length > 0;
 
@@ -92,6 +94,24 @@ export function DriverLoginScreen() {
             <Text style={styles.buttonText}>{t('driverLogin.submit')}</Text>
           )}
         </PressableScale>
+
+        <View style={styles.divider}>
+          <View style={styles.rule} />
+          <Text style={styles.dividerText}>{t('driverLogin.or')}</Text>
+          <View style={styles.rule} />
+        </View>
+
+        <PressableScale
+          accessibilityRole="button"
+          style={styles.googleButton}
+          onPress={() => setGoogleTapped(true)}
+        >
+          <GoogleLogo size={20} />
+          <Text style={styles.googleText}>{t('driverLogin.google')}</Text>
+        </PressableScale>
+        {googleTapped && !googleReady ? (
+          <Text style={styles.note}>{t('driverLogin.googleNotReady')}</Text>
+        ) : null}
 
         <Text style={styles.note}>{t('driverLogin.note')}</Text>
       </View>
@@ -162,6 +182,35 @@ const styles = StyleSheet.create({
   buttonText: {
     ...typography.bodyStrong,
     color: colors.onPrimary,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  rule: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    ...typography.bodySmall,
+    color: colors.textSubtle,
+  },
+  googleButton: {
+    height: controls.inputHeight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm + 2,
+    borderRadius: radius.md,
+    borderWidth: controls.borderWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  googleText: {
+    ...typography.bodyStrong,
+    color: colors.text,
   },
   note: {
     ...typography.caption,
