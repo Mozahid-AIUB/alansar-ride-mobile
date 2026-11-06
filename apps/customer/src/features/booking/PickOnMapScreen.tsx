@@ -6,6 +6,7 @@ import { NavigationArrow } from 'phosphor-react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useT } from '@alansar/i18n';
 import { lightTheme, palette } from '@alansar/theme';
 
 import { BackButton } from '@/components/BackButton';
@@ -30,6 +31,7 @@ const round = (n: number) => Math.round(n * 1e5) / 1e5;
  */
 export function PickOnMapScreen() {
   const insets = useSafeAreaInsets();
+  const t = useT();
   const { field: fieldParam } = useLocalSearchParams<{ field?: string }>();
   const field = fieldParam === 'pickup' ? 'pickup' : 'dropoff';
 
@@ -83,7 +85,7 @@ export function PickOnMapScreen() {
     else router.back();
   };
 
-  const title = field === 'pickup' ? 'Set your pickup' : 'Set your destination';
+  const title = field === 'pickup' ? t('pick.setPickup') : t('pick.setDestination');
 
   return (
     <View style={styles.root}>
@@ -125,14 +127,14 @@ export function PickOnMapScreen() {
 
       <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.hint}>Drag the map to move the pin</Text>
+        <Text style={styles.hint}>{t('pick.dragPin')}</Text>
         <View style={styles.address}>
           <View style={[styles.addressMark, field === 'pickup' ? styles.markPickup : styles.markDropoff]} />
           <Text style={[styles.addressText, resolving && styles.addressPending]} numberOfLines={2}>
             {resolving ? 'Finding the address…' : (label ?? 'Pinned location (no street name here)')}
           </Text>
         </View>
-        <Button label={field === 'pickup' ? 'Confirm pickup' : 'Confirm destination'} disabled={resolving} onPress={confirm} />
+        <Button label={field === 'pickup' ? t('pick.confirmPickup') : t('pick.confirmDestination')} disabled={resolving} onPress={confirm} />
       </View>
     </View>
   );

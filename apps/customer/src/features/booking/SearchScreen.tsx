@@ -13,6 +13,7 @@ import {
 } from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useT } from '@alansar/i18n';
 import { lightTheme, fonts } from '@alansar/theme';
 
 import { BackButton } from '@/components/BackButton';
@@ -31,6 +32,7 @@ type Field = 'pickup' | 'dropoff';
 /** Booking step 1: where from, where to. Picking a destination opens the ride options. */
 export function SearchScreen() {
   const insets = useSafeAreaInsets();
+  const t = useT();
   const { pickup, dropoff } = useBooking();
   const [active, setActive] = useState<Field>('dropoff');
   // What the passenger has typed; null shows the chosen place's name, so a
@@ -132,8 +134,8 @@ export function SearchScreen() {
   const setOnMap = (
     <PlaceRow
       icon={MapTrifold}
-      title="Set location on map"
-      subtitle={active === 'pickup' ? 'Drag the map to your pickup spot' : 'Drag the map to your destination'}
+      title={t('search.setOnMap')}
+      subtitle={active === 'pickup' ? t('search.dragPickup') : t('search.dragDropoff')}
       onPress={pickOnMap}
     />
   );
@@ -143,7 +145,7 @@ export function SearchScreen() {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <BackButton />
-        <Text style={styles.title}>Plan your ride</Text>
+        <Text style={styles.title}>{t('search.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -157,7 +159,7 @@ export function SearchScreen() {
           <SearchInput
             value={pickupText}
             onChangeText={setPickupDraft}
-            placeholder={locating ? 'Finding your location…' : 'Pickup location'}
+            placeholder={locating ? t('search.findingLocation') : t('search.pickup')}
             focused={active === 'pickup'}
             onFocus={() => setActive('pickup')}
           />
@@ -165,7 +167,7 @@ export function SearchScreen() {
             ref={dropoffInput}
             value={dropoffText}
             onChangeText={setDropoffDraft}
-            placeholder="Where to?"
+            placeholder={t('search.whereTo')}
             focused={active === 'dropoff'}
             onFocus={() => setActive('dropoff')}
             autoFocus
@@ -181,8 +183,8 @@ export function SearchScreen() {
           <PlaceRow
             icon={NavigationArrow}
             tone="brand"
-            title={locating ? 'Finding your location…' : 'Use my current location'}
-            subtitle={locateFailed ? 'Location is off. Allow it, or type your pickup.' : 'Pickup where you are now'}
+            title={locating ? t('search.findingLocation') : t('search.useCurrent')}
+            subtitle={locateFailed ? t('search.locationOff') : t('search.pickupHere')}
             onPress={() => void locate()}
           />
         ) : null}
@@ -194,7 +196,7 @@ export function SearchScreen() {
               <PlaceRow key={`c-${place.locationId}`} icon={Buildings} title={place.name} subtitle={place.address} onPress={() => choose(place)} />
             ))}
             {anywhereHits.length ? (
-              <Text style={styles.groupTitle}>{loosened ? `Places matching “${loosened}”` : 'More places'}</Text>
+              <Text style={styles.groupTitle}>{loosened ? t('search.matching', { text: loosened }) : t('search.morePlaces')}</Text>
             ) : null}
             {anywhereHits.map((hit) => (
               <PlaceRow
@@ -207,23 +209,23 @@ export function SearchScreen() {
               />
             ))}
             {resolveFailed ? (
-              <Text style={styles.muted}>Couldn't load that place. Try another, or set it on the map.</Text>
+              <Text style={styles.muted}>{t('search.resolveFailed')}</Text>
             ) : null}
             {!catalogueHits.length && !anywhereHits.length ? (
               <Text style={styles.muted}>
                 {query.length < 3
-                  ? 'Keep typing…'
+                  ? t('search.keepTyping')
                   : catalogue.isFetching || anywhere.isFetching
-                    ? 'Searching…'
-                    : `No places match “${query}”. Try a nearby landmark, or set it on the map.`}
+                    ? t('search.searching')
+                    : t('search.noMatch', { text: query })}
               </Text>
             ) : null}
             {setOnMap}
           </>
         ) : (
           <>
-            <Text style={styles.groupTitle}>Popular places</Text>
-            {popular.isError ? <Notice tone="error" message="Couldn't load popular places." /> : null}
+            <Text style={styles.groupTitle}>{t('search.popular')}</Text>
+            {popular.isError ? <Notice tone="error" message={t('search.popularError')} /> : null}
             {(popular.data ?? []).map((l) => {
               const place = fromCatalogue(l);
               return (
@@ -235,7 +237,7 @@ export function SearchScreen() {
 
         {dropoff && pickup && !searching ? (
           <View style={styles.continue}>
-            <PlaceRow icon={MapPin} tone="brand" title={`Continue to ${dropoff.name}`} subtitle="See rides and fares" onPress={() => router.push('/booking/review')} />
+            <PlaceRow icon={MapPin} tone="brand" title={t('search.continueTo', { name: dropoff.name })} subtitle={t('search.seeFares')} onPress={() => router.push('/booking/review')} />
           </View>
         ) : null}
       </ScrollView>
