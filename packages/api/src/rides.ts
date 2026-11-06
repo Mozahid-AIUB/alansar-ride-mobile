@@ -101,9 +101,9 @@ export const driversApi = {
   /** The signed-in driver's own profile. */
   me: () => request<DriverProfile>('GET', '/drivers/me', undefined, { auth: true }),
 
-  /** Go online (offered rides) or offline. */
-  setStatus: (driverId: string, online: boolean) =>
-    request<{ status: string }>('PUT', `/drivers/${driverId}/status`, { online }, { auth: true }),
+  /** Go online (offered rides) or offline. The API expects `isOnline`. */
+  setStatus: (driverId: string, isOnline: boolean) =>
+    request<{ is_online: boolean }>('PUT', `/drivers/${driverId}/status`, { isOnline }, { auth: true }),
 
   /** Report the driver's current position (no map; coordinates only). */
   updateLocation: (driverId: string, latitude: number, longitude: number) =>

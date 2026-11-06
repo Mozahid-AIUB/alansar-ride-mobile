@@ -39,7 +39,7 @@ export const driverStatus = {
     notify();
     try {
       const res = await driversApi.setStatus(id, next);
-      online = res.status === 'online' || next;
+      online = res.is_online ?? next;
     } catch {
       online = !next; // put it back
     } finally {
