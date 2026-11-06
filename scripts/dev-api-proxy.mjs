@@ -11,16 +11,19 @@ import http from 'node:http';
 
 const TARGET = process.env.API_TARGET ?? 'https://api.alansartaxi.com';
 const PORT = Number(process.env.PORT ?? 8787);
-const ALLOWED_ORIGIN = 'http://localhost:8081';
+// The rider preview runs on 8081 and the driver preview on 8082; echo back
+// whichever localhost origin asked, so both can use this one dev proxy.
+const ALLOWED_ORIGINS = ['http://localhost:8081', 'http://localhost:8082'];
 
-const cors = {
-  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+const corsFor = (origin) => ({
+  'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers': 'content-type, authorization',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-};
+});
 
 http
   .createServer(async (req, res) => {
+    const cors = corsFor(req.headers.origin);
     if (req.method === 'OPTIONS') {
       res.writeHead(204, cors);
       res.end();
