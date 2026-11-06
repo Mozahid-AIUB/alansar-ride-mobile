@@ -237,6 +237,28 @@ export const en = {
   'support.callUs': 'Call us',
   'support.emailUs': 'Email us',
 
+  // Driver — login
+  'driverLogin.tagline': 'Drive with Al Ansar.',
+  'driverLogin.title': 'Driver sign in',
+  'driverLogin.loginId': 'Phone or email',
+  'driverLogin.password': 'Password',
+  'driverLogin.submit': 'Sign in',
+  'driverLogin.note': 'Use the account the operator registered for you.',
+  'driverLogin.customerAccount': 'This is a rider account. Please use the Al Ansar Ride app.',
+
+  // Driver — home
+  'driverHome.greeting': 'Hi, {name}',
+  'driverHome.online': 'You are online',
+  'driverHome.offline': 'You are offline',
+  'driverHome.onlineBody': 'Looking for ride requests near you…',
+  'driverHome.offlineBody': 'Go online to start receiving ride requests.',
+  'driverHome.goOnline': 'Go online',
+  'driverHome.goOffline': 'Go offline',
+  'driverHome.today': "Today's trips",
+  'driverHome.earnings': 'Earnings',
+  'driverHome.noRequests': 'No ride requests yet. Stay online.',
+  'driverHome.logout': 'Log out',
+
   // Legal
   'legal.terms.title': 'Terms of Service',
   'legal.privacy.title': 'Privacy Policy',
@@ -545,6 +567,28 @@ export const bn: Partial<Record<TranslationKey, string>> = {
   'support.greeting': 'হ্যালো! আজ আমরা কীভাবে সাহায্য করতে পারি?',
   'support.callUs': 'আমাদের কল করুন',
   'support.emailUs': 'আমাদের ইমেইল করুন',
+
+  // Driver — login
+  'driverLogin.tagline': 'আল আনসারের সাথে গাড়ি চালান।',
+  'driverLogin.title': 'চালক সাইন ইন',
+  'driverLogin.loginId': 'ফোন বা ইমেইল',
+  'driverLogin.password': 'পাসওয়ার্ড',
+  'driverLogin.submit': 'সাইন ইন',
+  'driverLogin.note': 'অপারেটর আপনার জন্য যে অ্যাকাউন্ট তৈরি করেছে তা ব্যবহার করুন।',
+  'driverLogin.customerAccount': 'এটি একটি যাত্রী অ্যাকাউন্ট। অনুগ্রহ করে আল আনসার রাইড অ্যাপ ব্যবহার করুন।',
+
+  // Driver — home
+  'driverHome.greeting': 'হ্যালো, {name}',
+  'driverHome.online': 'আপনি অনলাইনে আছেন',
+  'driverHome.offline': 'আপনি অফলাইনে আছেন',
+  'driverHome.onlineBody': 'আপনার কাছে যাত্রার অনুরোধ খোঁজা হচ্ছে…',
+  'driverHome.offlineBody': 'যাত্রার অনুরোধ পেতে অনলাইনে যান।',
+  'driverHome.goOnline': 'অনলাইনে যান',
+  'driverHome.goOffline': 'অফলাইনে যান',
+  'driverHome.today': 'আজকের যাত্রা',
+  'driverHome.earnings': 'আয়',
+  'driverHome.noRequests': 'এখনো কোনো যাত্রার অনুরোধ নেই। অনলাইনে থাকুন।',
+  'driverHome.logout': 'লগ আউট',
 
   // Legal
   'legal.terms.title': 'সেবার শর্তাবলী',

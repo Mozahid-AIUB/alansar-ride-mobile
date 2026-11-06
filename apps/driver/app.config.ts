@@ -14,12 +14,22 @@ const config: ExpoConfig = {
     package: 'com.inferloom.alansarridedriver',
     // Must stay above the last Flutter build (1.0.0+2).
     versionCode: 3,
+    config: { googleMaps: { apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY } },
   },
   ios: {
     bundleIdentifier: 'com.inferloom.alansarridedriver',
   },
-  plugins: ['expo-router'],
-  experiments: { typedRoutes: true },
+  plugins: [
+    'expo-router',
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'Al Ansar Driver uses your location to show you to riders and guide you on trips.',
+      },
+    ],
+  ],
+  experiments: { typedRoutes: true, reactCompiler: true },
 };
 
 export default config;
